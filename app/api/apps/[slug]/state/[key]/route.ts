@@ -12,12 +12,31 @@ import { getApp } from "@/lib/registry";
  * identically and only the app knows the shape.
  */
 
+/**
+ * Every response here is specific to one visitor's cookie, so it must never be
+ * held in a shared cache. `private, no-store` keeps CDNs and proxies from
+ * retaining it at all, and `Vary: Cookie` means any cache that ignores that
+ * still cannot serve one visitor's body to another.
+ *
+ * Without these, adding a CDN in front of the app later would silently turn
+ * this endpoint into a cross-user leak.
+ */
+function json(body: unknown, status = 200) {
+  return NextResponse.json(body, {
+    status,
+    headers: {
+      "Cache-Control": "private, no-store, max-age=0, must-revalidate",
+      Vary: "Cookie",
+    },
+  });
+}
+
 /** Reject unknown slugs so a caller can't use the store as scratch space. */
-const badSlug = () => NextResponse.json({ error: "Unknown app" }, { status: 404 });
+const badSlug = () => json({ error: "Unknown app" }, 404);
 
 /** Keys are namespaced per app, but still bounded to keep the table sane. */
 const KEY_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
-const badKey = () => NextResponse.json({ error: "Invalid key" }, { status: 400 });
+const badKey = () => json({ error: "Invalid key" }, 400);
 
 /** Blobs are capped so one client cannot fill the disk. */
 const MAX_BYTES = 256 * 1024;
@@ -32,7 +51,7 @@ export async function GET(_request: Request, { params }: Params) {
   try {
     const userId = await requireUserId();
     const data = await readState(userId, slug, key);
-    return NextResponse.json({ data });
+    return json({ data });
   } catch (error) {
     return toErrorResponse(error);
   }
@@ -47,17 +66,17 @@ export async function PUT(request: Request, { params }: Params) {
   try {
     const text = await request.text();
     if (text.length > MAX_BYTES) {
-      return NextResponse.json({ error: "State too large" }, { status: 413 });
+      return json({ error: "State too large" }, 413);
     }
     body = JSON.parse(text);
   } catch {
-    return NextResponse.json({ error: "Body must be JSON" }, { status: 400 });
+    return json({ error: "Body must be JSON" }, 400);
   }
 
   try {
     const userId = await requireUserId();
     await writeState(userId, slug, key, body);
-    return NextResponse.json({ ok: true });
+    return json({ ok: true });
   } catch (error) {
     return toErrorResponse(error);
   }
@@ -71,7 +90,7 @@ export async function DELETE(_request: Request, { params }: Params) {
   try {
     const userId = await requireUserId();
     await deleteState(userId, slug, key);
-    return NextResponse.json({ ok: true });
+    return json({ ok: true });
   } catch (error) {
     return toErrorResponse(error);
   }
@@ -79,10 +98,10 @@ export async function DELETE(_request: Request, { params }: Params) {
 
 function toErrorResponse(error: unknown) {
   if (error instanceof UnauthorizedError) {
-    return NextResponse.json({ error: "No identity" }, { status: 401 });
+    return json({ error: "No identity" }, 401);
   }
   // The database is expected to be unavailable at times (it is ephemeral and
   // recreated on boot); the client falls back to local storage when it sees a 5xx.
   console.error("[state] request failed:", error);
-  return NextResponse.json({ error: "Storage unavailable" }, { status: 503 });
+  return json({ error: "Storage unavailable" }, 503);
 }
