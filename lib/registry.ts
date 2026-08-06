@@ -35,8 +35,9 @@ export const CATEGORY_LABELS: Record<AppCategory, string> = {
 export const CATEGORY_ORDER: AppCategory[] = ["scorekeeper", "game", "tool"];
 
 import { manifest as fiveCrowns } from "@/apps/five-crowns/manifest";
+import { manifest as canasta } from "@/apps/canasta/manifest";
 
-export const APPS: AppManifest[] = [fiveCrowns];
+export const APPS: AppManifest[] = [fiveCrowns, canasta];
 
 export function getApp(slug: string): AppManifest | undefined {
   return APPS.find((app) => app.slug === slug);
@@ -53,4 +54,5 @@ export function visibleApps(): AppManifest[] {
  */
 export const APP_COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
   "five-crowns": () => import("@/apps/five-crowns/FiveCrowns"),
+  canasta: () => import("@/apps/canasta/Canasta"),
 };

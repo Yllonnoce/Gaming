@@ -4,7 +4,11 @@ A small collection of games, scorekeepers, and utilities sharing one site, one
 look, and one storage layer. Each visitor's data is kept separate from everyone
 else's without anyone having to create an account.
 
-First app: **Five Crowns** — an eleven-round scorekeeper.
+Apps so far:
+
+- **Five Crowns** — eleven rounds, climbing wilds, lowest total wins.
+- **Canasta** — Classic partnership Canasta for up to four teams (eight players),
+  with a full scoring breakdown.
 
 ## Running it
 
@@ -23,6 +27,8 @@ at `data/gaming.db`, and the cookie secret falls back to a development default.
 | `npm start`         | Serve the production build          |
 | `npm run typecheck` | `tsc --noEmit`                      |
 | `npm run lint`      | ESLint                              |
+| `npm test`          | Scoring-rule unit tests             |
+| `npm run debug`     | Dev server with `--inspect` on :9229 |
 
 ## How identity works
 
@@ -81,6 +87,22 @@ Two ways to make it durable, neither requiring code changes:
    path. Note that disks limit the service to one instance and add brief
    downtime per deploy.
 
+## Canasta scoring
+
+The rules live in [`apps/canasta/scoring.ts`](apps/canasta/scoring.ts), kept
+apart from the UI because that is the part players argue about. Card values are
+not modelled — the scorekeeper enters the melded total and the hand penalty, and
+the module handles the bonuses (natural 500, mixed 300, going out 100 or 200
+concealed), the red-three rule that flips sign for a partnership that never
+melded, all four red threes counting double, and the meld minimum that climbs
+15 → 50 → 90 → 120 as a partnership's score grows.
+
+Because it is pure, it is tested directly rather than through the UI:
+
+```bash
+npm test
+```
+
 ## Adding an app
 
 Three steps, no routing or backend work.
@@ -129,6 +151,11 @@ app/
   api/apps/[slug]/state/[key]/route.ts  generic per-user storage
 apps/
   five-crowns/                          manifest + component
+  canasta/                              manifest + component + scoring rules
+tests/
+  canasta-scoring.test.mts              scoring-rule unit tests
+components/
+  ui.tsx          shared primitives -- every app draws from these
 lib/
   identity.ts     cookie signing and verification (Edge-safe)
   session.ts      current user, server-side

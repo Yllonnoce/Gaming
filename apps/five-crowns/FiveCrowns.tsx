@@ -1,6 +1,7 @@
 "use client";
 
-import { useAppState, type SyncStatus } from "@/lib/useAppState";
+import { useAppState } from "@/lib/useAppState";
+import { Button, TextInput, IconButton, Standings, FooterControls } from "@/components/ui";
 
 /**
  * Five Crowns scorekeeper.
@@ -179,9 +180,8 @@ export default function FiveCrowns() {
               <label className="sr-only" htmlFor={`player-${index}`}>
                 Player {index + 1} name
               </label>
-              <input
+              <TextInput
                 id={`player-${index}`}
-                className="min-w-0 flex-1 rounded-lg border border-lilac/35 bg-plum-deep/60 px-3 py-2.5 text-base text-cream outline-none focus:border-gold"
                 value={name}
                 placeholder={`Player ${index + 1}`}
                 onChange={(event) =>
@@ -192,9 +192,7 @@ export default function FiveCrowns() {
                   })
                 }
               />
-              <button
-                type="button"
-                className="w-11 rounded-lg border border-lilac/35 text-lg text-lilac transition enabled:hover:border-gold enabled:hover:text-gold disabled:opacity-30"
+              <IconButton
                 disabled={names.length <= MIN_PLAYERS}
                 onClick={() =>
                   setState((previous) => ({
@@ -205,30 +203,25 @@ export default function FiveCrowns() {
                 aria-label={`Remove player ${index + 1}`}
               >
                 ×
-              </button>
+              </IconButton>
             </div>
           ))}
 
           {names.length < MAX_PLAYERS && (
-            <button
-              type="button"
-              className="mt-1.5 w-full rounded-lg border border-gold/50 py-3 font-display text-sm font-bold uppercase tracking-[0.12em] text-gold transition hover:bg-gold/10"
+            <Button
+              variant="ghost"
+              className="mt-1.5"
               onClick={() =>
                 setState((previous) => ({ ...previous, names: [...previous.names, ""] }))
               }
             >
               + Add player
-            </button>
+            </Button>
           )}
 
-          <button
-            type="button"
-            className="mt-1.5 w-full rounded-lg bg-gold py-3.5 font-display text-sm font-bold uppercase tracking-[0.12em] text-plum transition hover:bg-gold-soft disabled:opacity-40 disabled:hover:bg-gold"
-            disabled={!canStart}
-            onClick={startGame}
-          >
+          <Button className="mt-1.5" disabled={!canStart} onClick={startGame}>
             Deal round 1
-          </button>
+          </Button>
 
           {!canStart && (
             <p className="mt-2.5 text-center text-sm text-lilac">
@@ -281,19 +274,14 @@ export default function FiveCrowns() {
               </div>
             ))}
 
-            <button
-              type="button"
-              className="mt-3 w-full rounded-lg bg-gold py-3.5 font-display text-sm font-bold uppercase tracking-[0.12em] text-plum transition hover:bg-gold-soft disabled:opacity-40 disabled:hover:bg-gold"
-              disabled={!entryIsValid}
-              onClick={saveRound}
-            >
+            <Button className="mt-3" disabled={!entryIsValid} onClick={saveRound}>
               {roundIsComplete(round) ? "Update round" : "Save round"}
-            </button>
+            </Button>
           </div>
 
           <div className="panel mb-4 p-4">
             <h2 className="label-caps mb-2">Standings</h2>
-            <Standings standings={standings} bestTotal={bestTotal} markLeader />
+            <Standings rows={standings} bestTotal={bestTotal} markLeader />
           </div>
 
           <div className="panel mb-4 p-4">
@@ -319,24 +307,16 @@ export default function FiveCrowns() {
               points
             </p>
             <div className="text-left">
-              <Standings standings={standings} bestTotal={bestTotal} />
+              <Standings rows={standings} bestTotal={bestTotal} />
             </div>
           </div>
 
-          <button
-            type="button"
-            className="mt-3 w-full rounded-lg bg-gold py-3.5 font-display text-sm font-bold uppercase tracking-[0.12em] text-plum transition hover:bg-gold-soft"
-            onClick={playAgain}
-          >
+          <Button className="mt-3" onClick={playAgain}>
             Play again — same players
-          </button>
-          <button
-            type="button"
-            className="mt-2 w-full rounded-lg border border-gold/50 py-3 font-display text-sm font-bold uppercase tracking-[0.12em] text-gold transition hover:bg-gold/10"
-            onClick={reset}
-          >
+          </Button>
+          <Button variant="ghost" className="mt-2" onClick={reset}>
             New players
-          </button>
+          </Button>
 
           <p className="mt-3 text-center text-sm text-lilac">
             Need to fix a score? Reopen any round below.
@@ -367,39 +347,6 @@ function WildCard({ wild }: { wild: string }) {
         {wild}
       </span>
     </div>
-  );
-}
-
-function Standings({
-  standings,
-  bestTotal,
-  markLeader = false,
-}: {
-  standings: { name: string; total: number }[];
-  bestTotal: number;
-  markLeader?: boolean;
-}) {
-  return (
-    <ol>
-      {standings.map((entry, index) => {
-        const leading = entry.total === bestTotal;
-        return (
-          <li
-            key={entry.name}
-            className={`flex items-baseline gap-2.5 py-1.5 text-[17px] ${
-              leading ? "text-gold" : ""
-            }`}
-          >
-            <span className="w-[18px] text-[13px] text-lilac">{index + 1}</span>
-            <span className="flex-1">
-              {markLeader && leading && <span aria-hidden="true">♛ </span>}
-              {entry.name}
-            </span>
-            <span className="font-display text-lg font-bold">{entry.total}</span>
-          </li>
-        );
-      })}
-    </ol>
   );
 }
 
@@ -437,40 +384,5 @@ function RoundChips({
         );
       })}
     </div>
-  );
-}
-
-/** Save state, plus the escape hatch to abandon the current game. */
-function FooterControls({ status, onReset }: { status: SyncStatus; onReset?: () => void }) {
-  return (
-    <div className="mt-5 flex items-center justify-between gap-3 text-sm text-lilac/70">
-      <SaveIndicator status={status} />
-      {onReset && (
-        <button
-          type="button"
-          className="underline underline-offset-2 transition hover:text-gold"
-          onClick={() => {
-            if (confirm("Abandon this game and start over?")) onReset();
-          }}
-        >
-          Start over
-        </button>
-      )}
-    </div>
-  );
-}
-
-function SaveIndicator({ status }: { status: SyncStatus }) {
-  const text: Record<SyncStatus, string> = {
-    loading: "Loading…",
-    saving: "Saving…",
-    synced: "Saved",
-    // Surfaced honestly rather than hidden: the game is safe, but only here.
-    local: "Saved on this device only",
-  };
-  return (
-    <span role="status" aria-live="polite">
-      {text[status]}
-    </span>
   );
 }
