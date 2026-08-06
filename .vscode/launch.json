@@ -1,0 +1,58 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Breakpoints in proxy.ts, route handlers, and Server Components.
+      "name": "Next.js: server-side",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      // VS Code resolves runtimeExecutable against its own environment, which
+      // does not include ~/.bashrc when launched from the desktop. This makes
+      // the Node install discoverable regardless of how VS Code was started.
+      "env": {
+        "PATH": "${env:HOME}/.local/bin:${env:HOME}/.local/node-v24.19.0-linux-x64/bin:${env:PATH}"
+      },
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    },
+    {
+      // Breakpoints in client components -- FiveCrowns.tsx, useAppState.ts.
+      // Requires the dev server to already be running.
+      "name": "Next.js: client-side",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "sourceMapPathOverrides": {
+        "webpack://_N_E/*": "${webRoot}/*",
+        "turbopack://[project]/*": "${webRoot}/*"
+      }
+    },
+    {
+      // Attaches to a dev server already started with `npm run debug`.
+      "name": "Next.js: attach to running server",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"],
+      "restart": true
+    }
+  ],
+  "compounds": [
+    {
+      // Starts the server under the debugger and opens Chrome against it, so
+      // breakpoints on both sides of the network boundary hit in one session.
+      "name": "Next.js: full stack",
+      "configurations": ["Next.js: server-side", "Next.js: client-side"],
+      "stopAll": true
+    }
+  ]
+}

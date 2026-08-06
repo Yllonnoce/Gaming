@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+/**
+ * Site palette. Deliberately dark and warm -- it started as the Five Crowns
+ * card-table theme and was generalised so every app shares one surface while
+ * still setting its own accent.
+ */
+@theme {
+  --color-plum-deep: #1a0f2b;
+  --color-plum: #241539;
+  --color-plum-light: #33204f;
+  --color-gold: #c9a227;
+  --color-gold-soft: #e0bc4e;
+  --color-cream: #f0e9dc;
+  --color-lilac: #b7a8d1;
+
+  --font-display: var(--font-cinzel), Georgia, serif;
+  --font-sans: var(--font-alegreya), system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    /* Prevents iOS Safari from inflating text in the score inputs. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background:
+      radial-gradient(120% 90% at 50% 0%, var(--color-plum-light) 0%, var(--color-plum) 55%, var(--color-plum-deep) 100%)
+      fixed;
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+  }
+
+  /* Number inputs: hide the spinners, which are useless on a score pad and
+     actively harmful on mobile where they shrink the tap target. */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  /* A visible focus ring everywhere, since the dark palette hides the default. */
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+}
+
+@utility panel {
+  background: rgb(247 241 227 / 0.06);
+  border: 1px solid rgb(201 162 39 / 0.35);
+  border-radius: 0.875rem;
+}
+
+@utility label-caps {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}

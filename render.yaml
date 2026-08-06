@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: game-night
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      # Signs the identity cookie. Render generates this once and keeps it
+      # stable across deploys -- if it ever changes, every visitor is issued a
+      # new identity and loses access to their stored games.
+      - key: IDENTITY_SECRET
+        generateValue: true
+      # Ephemeral by design on the free plan: this file is erased on every
+      # deploy and restart. Clients mirror their state to localStorage, so a
+      # wipe costs history but not an in-progress game.
+      #
+      # To make it durable, either:
+      #   1. move to a paid instance with a persistent disk, and point this at
+      #      the mount path (see the commented disk block below), or
+      #   2. create a free Turso database and set DATABASE_URL to its
+      #      libsql:// URL plus DATABASE_AUTH_TOKEN -- no code changes needed.
+      - key: DATABASE_URL
+        value: file:./data/gaming.db
+
+# Durable option 1: uncomment, and change `plan: free` to `plan: starter`
+# above. Disks are unavailable on free instances, and attaching one limits the
+# service to a single instance with brief downtime on each deploy.
+#
+#    disk:
+#      name: data
+#      mountPath: /var/data
+#      sizeGB: 1
+#
+# ...and set DATABASE_URL to: file:/var/data/gaming.db
