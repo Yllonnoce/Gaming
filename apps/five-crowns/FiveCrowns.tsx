@@ -64,7 +64,7 @@ export default function FiveCrowns() {
   // game" at someone who has one in progress.
   if (status === "loading") {
     return (
-      <div className="panel p-6 text-center text-lilac" role="status">
+      <div className="panel p-6 text-center text-muted" role="status">
         Shuffling…
       </div>
     );
@@ -166,7 +166,7 @@ export default function FiveCrowns() {
         <h1 className="font-display text-2xl font-bold uppercase tracking-[0.18em]">
           Five Crowns
         </h1>
-        <p className="mt-1 text-sm text-lilac">Scorekeeper · lowest total wins</p>
+        <p className="mt-1 text-sm text-muted">Scorekeeper · lowest total wins</p>
       </header>
 
       {phase === "setup" && (
@@ -224,7 +224,7 @@ export default function FiveCrowns() {
           </Button>
 
           {!canStart && (
-            <p className="mt-2.5 text-center text-sm text-lilac">
+            <p className="mt-2.5 text-center text-sm text-muted">
               Enter at least two names to start.
             </p>
           )}
@@ -240,9 +240,9 @@ export default function FiveCrowns() {
                 <div className="font-display text-xl font-bold tracking-wide">
                   Round {currentRound.num} of {ROUNDS.length}
                 </div>
-                <div className="mt-0.5 text-sm text-lilac">
+                <div className="mt-0.5 text-sm text-muted">
                   {currentRound.cards} cards ·{" "}
-                  <span className="font-bold text-gold">{currentRound.wild}s are wild</span>
+                  <span className="font-bold text-accent">{currentRound.wild}s are wild</span>
                 </div>
               </div>
             </div>
@@ -250,14 +250,14 @@ export default function FiveCrowns() {
             {players.map((player, playerIndex) => (
               <div
                 key={playerIndex}
-                className="flex items-center gap-2.5 border-b border-lilac/15 py-2 last:border-b-0"
+                className="flex items-center gap-2.5 border-b border-muted/15 py-2 last:border-b-0"
               >
                 <label className="flex-1 text-[17px] font-medium" htmlFor={`score-${playerIndex}`}>
                   {player}
                 </label>
                 <input
                   id={`score-${playerIndex}`}
-                  className="w-20 rounded-lg border border-lilac/35 bg-plum-deep/60 px-1.5 py-2.5 text-center font-display text-lg text-cream outline-none focus:border-gold"
+                  className="w-20 rounded-lg border border-muted/35 bg-well/60 px-1.5 py-2.5 text-center font-display text-lg text-ink outline-none focus:border-accent"
                   type="number"
                   inputMode="numeric"
                   min="0"
@@ -302,7 +302,7 @@ export default function FiveCrowns() {
             <h2 className="mt-2 font-display text-3xl font-bold tracking-wide">
               {winners.map((w) => w.name).join(" & ")}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-lilac">
+            <p className="mb-5 mt-0.5 text-[15px] text-muted">
               {winners.length > 1 ? "tie the crown" : "takes the crown"} with {bestTotal}{" "}
               points
             </p>
@@ -318,7 +318,7 @@ export default function FiveCrowns() {
             New players
           </Button>
 
-          <p className="mt-3 text-center text-sm text-lilac">
+          <p className="mt-3 text-center text-sm text-muted">
             Need to fix a score? Reopen any round below.
           </p>
           <div className="panel mt-3 p-4">
@@ -336,11 +336,11 @@ export default function FiveCrowns() {
 function WildCard({ wild }: { wild: string }) {
   return (
     <div
-      className="relative h-[82px] w-[58px] flex-shrink-0 -rotate-6 rounded-md bg-cream font-display font-bold text-plum shadow-[3px_4px_0_rgba(0,0,0,0.35)] transition-transform duration-200 hover:rotate-0 motion-reduce:transition-none"
+      className="relative h-[82px] w-[58px] flex-shrink-0 -rotate-6 rounded-md bg-card font-display font-bold text-card-ink shadow-[3px_4px_0_rgba(0,0,0,0.35)] transition-transform duration-200 hover:rotate-0 motion-reduce:transition-none"
       aria-hidden="true"
     >
       <span className="absolute left-[7px] top-[5px] text-[15px] leading-none">{wild}</span>
-      <span className="absolute inset-0 flex items-center justify-center text-3xl text-gold">
+      <span className="absolute inset-0 flex items-center justify-center text-3xl text-accent">
         ♛
       </span>
       <span className="absolute bottom-[5px] right-[7px] rotate-180 text-[15px] leading-none">
@@ -372,10 +372,10 @@ function RoundChips({
             aria-label={`Round ${round.num}, ${round.wild}s wild${done ? ", scored" : ""}`}
             className={`rounded-full border px-2.5 py-1.5 font-display text-[13px] transition ${
               active
-                ? "border-gold bg-gold font-bold text-plum"
+                ? "border-accent bg-accent font-bold text-on-accent"
                 : done
-                  ? "border-gold/55 text-gold hover:bg-gold/10"
-                  : "border-lilac/35 text-lilac hover:border-gold/55 hover:text-gold"
+                  ? "border-accent/55 text-accent hover:bg-accent/10"
+                  : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
             }`}
             onClick={() => onJump(index)}
           >

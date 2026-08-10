@@ -86,7 +86,7 @@ export default function Canasta() {
 
   if (status === "loading") {
     return (
-      <div className="panel p-6 text-center text-lilac" role="status">
+      <div className="panel p-6 text-center text-muted" role="status">
         Dealing…
       </div>
     );
@@ -227,7 +227,7 @@ export default function Canasta() {
     <div>
       <header className="mb-5 text-center">
         <h1 className="font-display text-2xl font-bold uppercase tracking-[0.18em]">Canasta</h1>
-        <p className="mt-1 text-sm text-lilac">Partnerships · highest total wins</p>
+        <p className="mt-1 text-sm text-muted">Partnerships · highest total wins</p>
       </header>
 
       {phase === "setup" && (
@@ -240,13 +240,13 @@ export default function Canasta() {
             {state.draftTeams.map((team, teamIndex) => (
               <div key={teamIndex} className="mb-4 last:mb-1">
                 <div className="mb-1.5 flex items-center justify-between">
-                  <span className="font-display text-sm tracking-wide text-lilac">
+                  <span className="font-display text-sm tracking-wide text-muted">
                     Team {teamIndex + 1}
                   </span>
                   {state.draftTeams.length > MIN_TEAMS && (
                     <button
                       type="button"
-                      className="text-sm text-lilac underline underline-offset-2 transition hover:text-gold"
+                      className="text-sm text-muted underline underline-offset-2 transition hover:text-accent"
                       onClick={() =>
                         setState((previous) => ({
                           ...previous,
@@ -299,7 +299,7 @@ export default function Canasta() {
               </Button>
             )}
 
-            <p className="mt-2.5 text-center text-sm text-lilac">
+            <p className="mt-2.5 text-center text-sm text-muted">
               Leave a partner blank to play that seat solo.
             </p>
           </div>
@@ -319,8 +319,8 @@ export default function Canasta() {
                   aria-pressed={state.draftEndKind === kind}
                   className={`flex-1 rounded-lg border px-2 py-2.5 font-display text-[13px] tracking-wide transition ${
                     state.draftEndKind === kind
-                      ? "border-gold bg-gold font-bold text-plum"
-                      : "border-lilac/35 text-lilac hover:border-gold/55 hover:text-gold"
+                      ? "border-accent bg-accent font-bold text-on-accent"
+                      : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
                   }`}
                   onClick={() => setState((previous) => ({ ...previous, draftEndKind: kind }))}
                 >
@@ -330,7 +330,7 @@ export default function Canasta() {
             </div>
 
             <label className="flex items-center gap-3 text-[15px]">
-              <span className="flex-1 text-lilac">
+              <span className="flex-1 text-muted">
                 {state.draftEndKind === "target" ? "Target score" : "Number of rounds"}
               </span>
               <TextInput
@@ -354,7 +354,7 @@ export default function Canasta() {
             Deal the first hand
           </Button>
           {!canStart && (
-            <p className="mt-2.5 text-center text-sm text-lilac">
+            <p className="mt-2.5 text-center text-sm text-muted">
               Name at least two partnerships to start.
             </p>
           )}
@@ -368,7 +368,7 @@ export default function Canasta() {
               <div className="font-display text-xl font-bold tracking-wide">
                 {editIndex !== null ? `Editing hand ${editIndex + 1}` : `Hand ${roundIndex + 1}`}
               </div>
-              <div className="mt-0.5 text-sm text-lilac">
+              <div className="mt-0.5 text-sm text-muted">
                 {endKind === "target"
                   ? `Playing to ${endValue}`
                   : `${saved.length} of ${endValue} hands played`}
@@ -377,7 +377,7 @@ export default function Canasta() {
             {editIndex !== null && (
               <button
                 type="button"
-                className="text-sm text-lilac underline underline-offset-2 transition hover:text-gold"
+                className="text-sm text-muted underline underline-offset-2 transition hover:text-accent"
                 onClick={cancelEdit}
               >
                 Cancel
@@ -441,7 +441,7 @@ export default function Canasta() {
             <h2 className="mt-2 font-display text-3xl font-bold tracking-wide">
               {winners.map((w) => w.name).join(" & ")}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-lilac">
+            <p className="mb-5 mt-0.5 text-[15px] text-muted">
               {winners.length > 1 ? "tie the crown" : "takes the crown"} with {bestTotal} points
               {" · "}
               {saved.length} {saved.length === 1 ? "hand" : "hands"}
@@ -458,7 +458,7 @@ export default function Canasta() {
             New partnerships
           </Button>
 
-          <p className="mt-3 text-center text-sm text-lilac">
+          <p className="mt-3 text-center text-sm text-muted">
             Need to fix a score? Reopen any hand below.
           </p>
           <div className="panel mt-3 p-4">
@@ -498,12 +498,12 @@ function TeamCard({
 }) {
   return (
     <div className="panel mb-3 p-4">
-      <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-lilac/15 pb-2.5">
+      <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-muted/15 pb-2.5">
         <span className="font-display text-lg font-bold tracking-wide">{label}</span>
-        <span className="text-right text-[13px] leading-tight text-lilac">
+        <span className="text-right text-[13px] leading-tight text-muted">
           {runningTotal} pts
           <br />
-          <span className="text-lilac/70">meld {meldMinimum}</span>
+          <span className="text-muted/70">meld {meldMinimum}</span>
         </span>
       </div>
 
@@ -541,8 +541,8 @@ function TeamCard({
           aria-pressed={wentOut}
           className={`rounded-full border px-3 py-1.5 font-display text-[13px] transition ${
             wentOut
-              ? "border-gold bg-gold font-bold text-plum"
-              : "border-lilac/35 text-lilac hover:border-gold/55 hover:text-gold"
+              ? "border-accent bg-accent font-bold text-on-accent"
+              : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
           }`}
           onClick={onToggleOut}
         >
@@ -554,8 +554,8 @@ function TeamCard({
             aria-pressed={concealed}
             className={`rounded-full border px-3 py-1.5 font-display text-[13px] transition ${
               concealed
-                ? "border-gold bg-gold font-bold text-plum"
-                : "border-lilac/35 text-lilac hover:border-gold/55 hover:text-gold"
+                ? "border-accent bg-accent font-bold text-on-accent"
+                : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
             }`}
             onClick={onToggleConcealed}
           >
@@ -565,20 +565,20 @@ function TeamCard({
       </div>
 
       {/* The working, so a disputed total can be checked without re-entry. */}
-      <div className="mt-2 border-t border-lilac/15 pt-2.5">
+      <div className="mt-2 border-t border-muted/15 pt-2.5">
         {score.lines.length === 0 ? (
-          <p className="text-sm text-lilac/70">Nothing recorded for this hand yet.</p>
+          <p className="text-sm text-muted/70">Nothing recorded for this hand yet.</p>
         ) : (
           <ul className="mb-1.5">
             {score.lines.map((line, index) => (
               <li key={index} className="flex items-baseline gap-2 py-0.5 text-sm">
-                <span className="flex-1 text-lilac">
+                <span className="flex-1 text-muted">
                   {line.label}
-                  {line.detail && <span className="text-lilac/60"> · {line.detail}</span>}
+                  {line.detail && <span className="text-muted/60"> · {line.detail}</span>}
                 </span>
                 <span
                   className={`font-display tabular-nums ${
-                    line.points < 0 ? "text-lilac" : "text-cream"
+                    line.points < 0 ? "text-muted" : "text-ink"
                   }`}
                 >
                   {line.points > 0 ? "+" : ""}
@@ -588,9 +588,9 @@ function TeamCard({
             ))}
           </ul>
         )}
-        <div className="flex items-baseline gap-2 border-t border-lilac/15 pt-2">
+        <div className="flex items-baseline gap-2 border-t border-muted/15 pt-2">
           <span className="label-caps flex-1">Hand total</span>
-          <span className="font-display text-xl font-bold tabular-nums text-gold">
+          <span className="font-display text-xl font-bold tabular-nums text-accent">
             {score.total}
           </span>
         </div>
@@ -611,7 +611,7 @@ function Counter({
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="flex items-center gap-2 border-b border-lilac/15 py-2">
+    <div className="flex items-center gap-2 border-b border-muted/15 py-2">
       <span className="flex-1 text-[15px]">{label}</span>
       <IconButton
         className="!w-9 py-1.5"
@@ -650,7 +650,7 @@ function NumberRow({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="flex items-center gap-2 border-b border-lilac/15 py-2">
+    <label className="flex items-center gap-2 border-b border-muted/15 py-2">
       <span className="flex-1 text-[15px]">{label}</span>
       <TextInput
         type="number"
@@ -684,8 +684,8 @@ function HandChips({
           aria-label={`Edit hand ${index + 1}`}
           className={`rounded-full border px-3 py-1.5 font-display text-[13px] transition ${
             index === editing
-              ? "border-gold bg-gold font-bold text-plum"
-              : "border-gold/55 text-gold hover:bg-gold/10"
+              ? "border-accent bg-accent font-bold text-on-accent"
+              : "border-accent/55 text-accent hover:bg-accent/10"
           }`}
           onClick={() => onEdit(index)}
         >

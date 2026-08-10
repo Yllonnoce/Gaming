@@ -2,8 +2,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      // Breakpoints in proxy.ts, route handlers, and Server Components.
-      "name": "Next.js: server-side",
+      // Starts the dev server under the debugger, waits for it to report ready,
+      // then opens the browser against it. Breakpoints work on both sides:
+      // proxy.ts and route handlers on the server, FiveCrowns.tsx and
+      // useAppState.ts in the browser.
+      "name": "Next.js: full stack",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
@@ -17,42 +20,41 @@
       "env": {
         "PATH": "${env:HOME}/.local/bin:${env:HOME}/.local/node-v24.19.0-linux-x64/bin:${env:PATH}"
       },
+      // Waiting for the "Local:" line beats launching the browser immediately,
+      // which would hit a connection error before Next finishes compiling.
       "serverReadyAction": {
-        "pattern": "- Local:.+(https?://.+)",
+        "pattern": "- Local:\\s+(https?://\\S+)",
         "uriFormat": "%s",
-        "action": "debugWithChrome"
+        "action": "startDebugging",
+        "name": "Next.js: browser only"
       }
     },
     {
-      // Breakpoints in client components -- FiveCrowns.tsx, useAppState.ts.
-      // Requires the dev server to already be running.
-      "name": "Next.js: client-side",
+      // Browser-side only; expects a dev server already running on :3000.
+      "name": "Next.js: browser only",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}",
+      // Chrome here is a Flatpak, so there is no native executable for VS Code
+      // to find -- without this it fails with "unable to launch browser".
+      "runtimeExecutable": "${workspaceFolder}/.vscode/chrome-flatpak.sh",
+      // Must be inside the Flatpak's own data directory. VS Code's default
+      // profile path is under /tmp, which the sandbox cannot see.
+      "userDataDir": "${env:HOME}/.var/app/com.google.Chrome/vscode-debug-profile",
       "sourceMapPathOverrides": {
         "webpack://_N_E/*": "${webRoot}/*",
         "turbopack://[project]/*": "${webRoot}/*"
       }
     },
     {
-      // Attaches to a dev server already started with `npm run debug`.
+      // Attaches to a dev server started separately with `npm run debug`.
       "name": "Next.js: attach to running server",
       "type": "node",
       "request": "attach",
       "port": 9229,
       "skipFiles": ["<node_internals>/**"],
       "restart": true
-    }
-  ],
-  "compounds": [
-    {
-      // Starts the server under the debugger and opens Chrome against it, so
-      // breakpoints on both sides of the network boundary hit in one session.
-      "name": "Next.js: full stack",
-      "configurations": ["Next.js: server-side", "Next.js: client-side"],
-      "stopAll": true
     }
   ]
 }

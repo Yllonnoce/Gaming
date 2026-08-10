@@ -9,6 +9,18 @@ Apps so far:
 - **Five Crowns** — eleven rounds, climbing wilds, lowest total wins.
 - **Canasta** — Classic partnership Canasta for up to four teams (eight players),
   with a full scoring breakdown.
+- **Mexican Train** — one hand per double from the set's highest down to the
+  blank; double-12 and double-15 sets, lowest pips win.
+- **Phase 10** — ten phases in order; first to finish wins, lowest score breaks ties.
+- **Hearts** — points checked against the 26 a hand always distributes; shooting
+  the moon handled as a rule rather than arithmetic.
+- **Spades** — partnership bids with bags carried between hands and the
+  ten-bag penalty applied automatically. Nil and blind nil both ways.
+- **Pinochle** — single-deck partnerships with a meld breakdown; a bidding team
+  that falls short is set and loses the bid.
+- **Rummy** — hands to 500.
+- **Golf** — nine or eighteen holes, lowest wins.
+- **Farkle** — banked points to 10,000.
 
 ## Running it
 
@@ -29,6 +41,31 @@ at `data/gaming.db`, and the cookie secret falls back to a development default.
 | `npm run lint`      | ESLint                              |
 | `npm test`          | Scoring-rule unit tests             |
 | `npm run debug`     | Dev server with `--inspect` on :9229 |
+
+## Theming
+
+Six palettes: **Midnight** (default), **Forest**, **Sapphire**, **Ember**,
+**Slate**, and **Parchment** (the one light theme). The picker sits on the hub
+and on every app page; the choice is saved to `localStorage` and applies to the
+whole site.
+
+Tokens are named by *role* rather than by colour — `accent`, `ink`, `muted`,
+`on-accent`, `well`, `card` — because the same class has to read correctly in
+all six. Components never name a colour, so a theme is purely a block of CSS
+variables in [`app/globals.css`](app/globals.css) plus an entry in
+[`lib/themes.ts`](lib/themes.ts). Adding a seventh needs no component changes.
+
+Two details worth knowing:
+
+- **No flash.** A small blocking script in `<head>` sets `data-theme` before the
+  body paints. Doing this in React would show a frame of the default palette
+  first. It also means pages stay statically generated — reading the preference
+  server-side would force every route to render per-request.
+- **Contrast is checked, not assumed.** Every text/background pair in every
+  theme meets WCAG AA (4.5:1); the tightest is 5.3:1.
+
+Changing the theme in one tab updates any other open tab, via the `storage`
+event in [`lib/theme-client.ts`](lib/theme-client.ts).
 
 ## How identity works
 
@@ -103,6 +140,51 @@ Because it is pure, it is tested directly rather than through the UI:
 npm test
 ```
 
+## Mexican Train
+
+The set determines the length of the game: you play one hand per double,
+counting down from the set's highest to double-blank, so a double-12 set is 13
+hands and a double-15 set is 16. That derivation lives in
+[`apps/mexican-train/sets.ts`](apps/mexican-train/sets.ts) and everything
+follows from `highestDouble` — supporting double-18 later is one more entry in
+`SETS` and no other change.
+
+Scoring is one pip total per player per hand, lowest wins; an empty hand is
+simply worth nothing, so going out needs no special case. The optional
+double-blank house rule gives the 0-0 tile a fixed penalty in place of its zero.
+
+## The shared scorekeeper
+
+Golf, Rummy and Farkle differ only in wording, direction and how the game ends,
+so they are configuration passed to
+[`SimpleScorekeeper`](components/scorekeeper/SimpleScorekeeper.tsx) rather than
+three near-identical components — each app file is about twenty lines. Games
+needing extra per-player state (Hearts' moon, Phase 10's phases, the two
+bidding games) have their own components and reuse the primitives in
+[`components/ui.tsx`](components/ui.tsx) instead.
+
+Scoring rules live in a `scoring.ts` beside each app that has any, kept apart
+from the UI and tested directly:
+
+```bash
+npm test
+```
+
+## Rules
+
+Every app carries its own rules, shown in a collapsible panel below the
+scorekeeper. They live in `apps/<slug>/rules.ts` as plain data
+([`lib/rules.ts`](lib/rules.ts) defines the shape), so each game presents the
+same way and the panel needs no per-game markup.
+
+[`RulesPanel`](components/RulesPanel.tsx) is built on `<details>` rather than
+React state — it works before hydration and without JavaScript, which matters
+for the thing you reach for mid-game.
+
+Each set of rules ends with **what this scorekeeper assumes**: the places where
+the app commits to one reading of a rule that tables vary on. That section is
+there so the rules can never quietly contradict the arithmetic.
+
 ## Adding an app
 
 Three steps, no routing or backend work.
@@ -135,6 +217,9 @@ export default function Yahtzee() {
 }
 ```
 
+**2b.** Optionally add `apps/<slug>/rules.ts` and register it in
+[`lib/rules.ts`](lib/rules.ts) to get a rules panel on the app page.
+
 **3.** Register it in [`lib/registry.ts`](lib/registry.ts) — add the manifest to
 `APPS` and the dynamic import to `APP_COMPONENTS`. It now appears on the hub at
 `/`, is routed at `/apps/<slug>`, and has storage scoped to each visitor.
@@ -152,12 +237,23 @@ app/
 apps/
   five-crowns/                          manifest + component
   canasta/                              manifest + component + scoring rules
+  mexican-train/                        manifest + component + set definitions
+  phase-10/ hearts/ spades/ pinochle/   manifest + component + scoring rules
+  rummy/ golf/ farkle/                  manifest + SimpleScorekeeper config
+components/scorekeeper/
+  SimpleScorekeeper.tsx                 engine for one-number-per-round games
+components/
+  RulesPanel.tsx                        collapsible per-game rules
 tests/
   canasta-scoring.test.mts              scoring-rule unit tests
+  mexican-train-sets.test.mts           set/round derivation unit tests
 components/
   ui.tsx          shared primitives -- every app draws from these
+  ThemePicker.tsx the six-swatch theme selector
 lib/
   identity.ts     cookie signing and verification (Edge-safe)
+  themes.ts       theme catalogue + no-flash boot script
+  theme-client.ts active theme as an external store
   session.ts      current user, server-side
   db.ts           libSQL connection and schema
   store.ts        user-scoped queries

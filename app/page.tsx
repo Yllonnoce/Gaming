@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SITE } from "@/lib/site";
 import { visibleApps, CATEGORY_LABELS, CATEGORY_ORDER, type AppManifest } from "@/lib/registry";
+import { ThemePicker } from "@/components/ThemePicker";
 import { currentUserId } from "@/lib/session";
 import { touchUser } from "@/lib/store";
 
@@ -26,13 +27,16 @@ export default async function HubPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pb-16 pt-10 sm:pt-14">
       <header className="mb-10 text-center">
-        <div className="text-3xl tracking-[0.4em] text-gold" aria-hidden="true">
+        <div className="text-3xl tracking-[0.4em] text-accent" aria-hidden="true">
           ♠♥♦♣
         </div>
         <h1 className="mt-3 font-display text-3xl font-bold uppercase tracking-[0.15em] sm:text-4xl">
           {SITE.name}
         </h1>
-        <p className="mt-2 text-lilac">{SITE.tagline}</p>
+        <p className="mt-2 text-muted">{SITE.tagline}</p>
+        <div className="mt-5 flex justify-center">
+          <ThemePicker />
+        </div>
       </header>
 
       {CATEGORY_ORDER.map((category) => {
@@ -51,7 +55,7 @@ export default async function HubPage() {
         );
       })}
 
-      <p className="mt-12 text-center text-sm text-lilac/70">
+      <p className="mt-12 text-center text-sm text-muted/70">
         Your games are saved to this browser automatically. No account needed.
       </p>
     </main>
@@ -62,14 +66,14 @@ function AppCard({ app }: { app: AppManifest }) {
   return (
     <Link
       href={`/apps/${app.slug}`}
-      className="panel group flex items-start gap-3 p-4 transition hover:border-gold/70 hover:bg-cream/10"
+      className="panel group flex items-start gap-3 p-4 transition hover:border-accent/70 hover:bg-ink/10"
     >
       <span className={`text-3xl leading-none ${app.accent}`} aria-hidden="true">
         {app.icon}
       </span>
       <span className="min-w-0">
         <span className="block font-display text-lg font-bold tracking-wide">{app.title}</span>
-        <span className="mt-0.5 block text-sm text-lilac">{app.blurb}</span>
+        <span className="mt-0.5 block text-sm text-muted">{app.blurb}</span>
       </span>
     </Link>
   );

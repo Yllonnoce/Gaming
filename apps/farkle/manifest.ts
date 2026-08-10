@@ -1,10 +1,10 @@
 import type { AppManifest } from "@/lib/registry";
 
 export const manifest: AppManifest = {
-  slug: "five-crowns",
-  title: "Five Crowns",
-  blurb: "Eleven rounds, wilds that climb, lowest total wins.",
+  slug: "farkle",
+  title: "Farkle",
+  blurb: "Push your luck with six dice. First to 10,000.",
   category: "scorekeeper",
-  icon: "♛",
+  icon: "🎲",
   accent: "text-accent",
 };

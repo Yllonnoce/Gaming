@@ -36,8 +36,27 @@ export const CATEGORY_ORDER: AppCategory[] = ["scorekeeper", "game", "tool"];
 
 import { manifest as fiveCrowns } from "@/apps/five-crowns/manifest";
 import { manifest as canasta } from "@/apps/canasta/manifest";
+import { manifest as mexicanTrain } from "@/apps/mexican-train/manifest";
+import { manifest as phase10 } from "@/apps/phase-10/manifest";
+import { manifest as hearts } from "@/apps/hearts/manifest";
+import { manifest as spades } from "@/apps/spades/manifest";
+import { manifest as pinochle } from "@/apps/pinochle/manifest";
+import { manifest as rummy } from "@/apps/rummy/manifest";
+import { manifest as golf } from "@/apps/golf/manifest";
+import { manifest as farkle } from "@/apps/farkle/manifest";
 
-export const APPS: AppManifest[] = [fiveCrowns, canasta];
+export const APPS: AppManifest[] = [
+  fiveCrowns,
+  canasta,
+  mexicanTrain,
+  phase10,
+  hearts,
+  spades,
+  pinochle,
+  rummy,
+  golf,
+  farkle,
+];
 
 export function getApp(slug: string): AppManifest | undefined {
   return APPS.find((app) => app.slug === slug);
@@ -55,4 +74,12 @@ export function visibleApps(): AppManifest[] {
 export const APP_COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
   "five-crowns": () => import("@/apps/five-crowns/FiveCrowns"),
   canasta: () => import("@/apps/canasta/Canasta"),
+  "mexican-train": () => import("@/apps/mexican-train/MexicanTrain"),
+  "phase-10": () => import("@/apps/phase-10/Phase10"),
+  hearts: () => import("@/apps/hearts/Hearts"),
+  spades: () => import("@/apps/spades/Spades"),
+  pinochle: () => import("@/apps/pinochle/Pinochle"),
+  rummy: () => import("@/apps/rummy/Rummy"),
+  golf: () => import("@/apps/golf/Golf"),
+  farkle: () => import("@/apps/farkle/Farkle"),
 };

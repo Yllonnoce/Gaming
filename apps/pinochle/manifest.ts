@@ -1,10 +1,10 @@
 import type { AppManifest } from "@/lib/registry";
 
 export const manifest: AppManifest = {
-  slug: "five-crowns",
-  title: "Five Crowns",
-  blurb: "Eleven rounds, wilds that climb, lowest total wins.",
+  slug: "pinochle",
+  title: "Pinochle",
+  blurb: "Meld and tricks, single deck partnerships.",
   category: "scorekeeper",
-  icon: "♛",
+  icon: "🂮",
   accent: "text-accent",
 };

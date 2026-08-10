@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getApp, APPS, APP_COMPONENTS } from "@/lib/registry";
+import { ThemePicker } from "@/components/ThemePicker";
+import { RulesPanel } from "@/components/RulesPanel";
+import { getRules } from "@/lib/rules";
 
 /**
  * One route hosts every app. It resolves the slug against the registry and
@@ -29,18 +32,21 @@ export default async function AppPage({ params }: Props) {
   if (!app || !load) notFound();
 
   const { default: AppComponent } = await load();
+  const rules = getRules(slug);
 
   return (
     <main className="mx-auto w-full max-w-xl px-4 pb-16 pt-6">
-      <nav className="mb-4">
+      <nav className="mb-4 flex items-center justify-between gap-4">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-lilac transition hover:text-gold"
+          className="inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-accent"
         >
           <span aria-hidden="true">←</span> All apps
         </Link>
+        <ThemePicker />
       </nav>
       <AppComponent />
+      {rules && <RulesPanel rules={rules} title={app.title} />}
     </main>
   );
 }

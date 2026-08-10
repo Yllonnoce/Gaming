@@ -6,5 +6,5 @@ export const manifest: AppManifest = {
   blurb: "Partnerships, red threes, and the long climb to 5000.",
   category: "scorekeeper",
   icon: "🃏",
-  accent: "text-gold",
+  accent: "text-accent",
 };
