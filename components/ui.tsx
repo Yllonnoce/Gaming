@@ -70,9 +70,9 @@ export function Standings({
         return (
           <li
             key={row.name}
-            className={`flex items-baseline gap-2.5 py-1.5 text-[17px] ${leading ? "text-accent" : ""}`}
+            className={`flex items-baseline gap-2.5 py-1.5 text-[1.0625rem] ${leading ? "text-accent" : ""}`}
           >
-            <span className="w-[18px] shrink-0 text-[13px] text-muted">{index + 1}</span>
+            <span className="w-[18px] shrink-0 text-[0.8125rem] text-muted">{index + 1}</span>
             <span className="flex-1">
               {markLeader && leading && <span aria-hidden="true">♛ </span>}
               {row.name}

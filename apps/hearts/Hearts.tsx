@@ -251,7 +251,7 @@ export default function Hearts() {
                 key={index}
                 className="flex items-center gap-2 border-b border-muted/15 py-2 last:border-b-0"
               >
-                <span className="flex-1 text-[17px]">{player}</span>
+                <span className="flex-1 text-[1.0625rem]">{player}</span>
 
                 <button
                   type="button"
@@ -267,7 +267,7 @@ export default function Hearts() {
                       },
                     }))
                   }
-                  className={`rounded-full border px-2.5 py-1 font-display text-[13px] transition ${
+                  className={`rounded-full border px-2.5 py-1 font-display text-[0.8125rem] transition ${
                     entry.moonShooter === index
                       ? "border-accent bg-accent font-bold text-on-accent"
                       : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
@@ -325,7 +325,7 @@ export default function Hearts() {
               )}
             </div>
             {!balanced && (
-              <p className="mt-1.5 text-center text-[13px] text-muted">
+              <p className="mt-1.5 text-center text-[0.8125rem] text-muted">
                 A hand should come to {HAND_TOTAL}. You can still save it if your table plays a
                 variant.
               </p>
@@ -362,7 +362,7 @@ export default function Hearts() {
             <h2 className="mt-2 font-display text-3xl font-bold tracking-wide">
               {winners.map((w) => w.name).join(" & ")}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-muted">
+            <p className="mb-5 mt-0.5 text-[0.9375rem] text-muted">
               {winners.length > 1 ? "tie the crown" : "takes the crown"} with {bestTotal} points
             </p>
             <div className="text-left">
@@ -407,7 +407,7 @@ function HandChips({
           aria-current={index === editing ? "step" : undefined}
           aria-label={`Edit hand ${index + 1}`}
           onClick={() => onEdit(index)}
-          className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[13px] transition ${
+          className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[0.8125rem] transition ${
             index === editing
               ? "border-accent bg-accent font-bold text-on-accent"
               : "border-accent/55 text-accent hover:bg-accent/10"

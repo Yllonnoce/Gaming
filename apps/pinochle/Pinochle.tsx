@@ -251,7 +251,7 @@ export default function Pinochle() {
                       },
                     }))
                   }
-                  className={`flex-1 rounded-lg border px-2 py-2 font-display text-[13px] transition ${
+                  className={`flex-1 rounded-lg border px-2 py-2 font-display text-[0.8125rem] transition ${
                     entry.biddingTeam === teamIndex
                       ? "border-accent bg-accent font-bold text-on-accent"
                       : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
@@ -277,7 +277,7 @@ export default function Pinochle() {
               />
             </div>
             {entry.biddingTeam === null && (
-              <p className="mt-2 text-center text-[13px] text-muted">
+              <p className="mt-2 text-center text-[0.8125rem] text-muted">
                 Pick the team that took the bid — they lose it outright if they fall short.
               </p>
             )}
@@ -330,18 +330,18 @@ export default function Pinochle() {
             <h2 className="mt-2 font-display text-3xl font-bold tracking-wide">
               {winners.map((w) => w.name).join(" & ")}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-muted">
+            <p className="mb-5 mt-0.5 text-[0.9375rem] text-muted">
               {winners.length > 1 ? "tie" : "wins"} with {bestTotal} points
             </p>
             <ol className="text-left">
               {ranked.map((team, index) => (
                 <li
                   key={team.name}
-                  className={`flex items-baseline gap-2.5 py-1.5 text-[17px] ${
+                  className={`flex items-baseline gap-2.5 py-1.5 text-[1.0625rem] ${
                     team.total === bestTotal ? "text-accent" : ""
                   }`}
                 >
-                  <span className="w-[18px] shrink-0 text-[13px] text-muted">{index + 1}</span>
+                  <span className="w-[18px] shrink-0 text-[0.8125rem] text-muted">{index + 1}</span>
                   <span className="flex-1">{team.name}</span>
                   <span className="font-display text-lg font-bold tabular-nums">{team.total}</span>
                 </li>
@@ -394,22 +394,22 @@ function TeamCard({
       <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-muted/15 pb-2.5">
         <span className="font-display text-lg font-bold tracking-wide">
           {label}
-          {isBidder && <span className="ml-2 text-[13px] font-normal text-accent">bid {bid}</span>}
+          {isBidder && <span className="ml-2 text-[0.8125rem] font-normal text-accent">bid {bid}</span>}
         </span>
-        <span className="text-[13px] text-muted">{runningTotal} pts</span>
+        <span className="text-[0.8125rem] text-muted">{runningTotal} pts</span>
       </div>
 
       {MELDS.map((item) => {
         const count = hand.melds[item.key] ?? 0;
         return (
           <div key={item.key} className="flex items-center gap-2 border-b border-muted/15 py-1.5">
-            <span className="flex-1 text-[15px]">
+            <span className="flex-1 text-[0.9375rem]">
               {item.label}
               {"detail" in item && item.detail && (
-                <span className="ml-1.5 text-[13px] text-muted">{item.detail}</span>
+                <span className="ml-1.5 text-[0.8125rem] text-muted">{item.detail}</span>
               )}
             </span>
-            <span className="w-9 text-right text-[13px] text-muted">{item.value}</span>
+            <span className="w-9 text-right text-[0.8125rem] text-muted">{item.value}</span>
             <IconButton
               className="!w-8 py-1"
               disabled={count <= 0}
@@ -436,7 +436,7 @@ function TeamCard({
       </div>
 
       <label className="flex items-center gap-2 py-2">
-        <span className="flex-1 text-[15px]">Trick points</span>
+        <span className="flex-1 text-[0.9375rem]">Trick points</span>
         <TextInput
           type="number"
           inputMode="numeric"
@@ -490,7 +490,7 @@ function HandChips({
           aria-current={index === editing ? "step" : undefined}
           aria-label={`Edit hand ${index + 1}`}
           onClick={() => onEdit(index)}
-          className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[13px] transition ${
+          className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[0.8125rem] transition ${
             index === editing
               ? "border-accent bg-accent font-bold text-on-accent"
               : "border-accent/55 text-accent hover:bg-accent/10"

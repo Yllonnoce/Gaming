@@ -317,7 +317,7 @@ export default function Canasta() {
                   key={kind}
                   type="button"
                   aria-pressed={state.draftEndKind === kind}
-                  className={`flex-1 rounded-lg border px-2 py-2.5 font-display text-[13px] tracking-wide transition ${
+                  className={`flex-1 rounded-lg border px-2 py-2.5 font-display text-[0.8125rem] tracking-wide transition ${
                     state.draftEndKind === kind
                       ? "border-accent bg-accent font-bold text-on-accent"
                       : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
@@ -329,7 +329,7 @@ export default function Canasta() {
               ))}
             </div>
 
-            <label className="flex items-center gap-3 text-[15px]">
+            <label className="flex items-center gap-3 text-[0.9375rem]">
               <span className="flex-1 text-muted">
                 {state.draftEndKind === "target" ? "Target score" : "Number of rounds"}
               </span>
@@ -441,7 +441,7 @@ export default function Canasta() {
             <h2 className="mt-2 font-display text-3xl font-bold tracking-wide">
               {winners.map((w) => w.name).join(" & ")}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-muted">
+            <p className="mb-5 mt-0.5 text-[0.9375rem] text-muted">
               {winners.length > 1 ? "tie the crown" : "takes the crown"} with {bestTotal} points
               {" · "}
               {saved.length} {saved.length === 1 ? "hand" : "hands"}
@@ -500,7 +500,7 @@ function TeamCard({
     <div className="panel mb-3 p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-muted/15 pb-2.5">
         <span className="font-display text-lg font-bold tracking-wide">{label}</span>
-        <span className="text-right text-[13px] leading-tight text-muted">
+        <span className="text-right text-[0.8125rem] leading-tight text-muted">
           {runningTotal} pts
           <br />
           <span className="text-muted/70">meld {meldMinimum}</span>
@@ -539,7 +539,7 @@ function TeamCard({
         <button
           type="button"
           aria-pressed={wentOut}
-          className={`rounded-full border px-3 py-1.5 font-display text-[13px] transition ${
+          className={`rounded-full border px-3 py-1.5 font-display text-[0.8125rem] transition ${
             wentOut
               ? "border-accent bg-accent font-bold text-on-accent"
               : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
@@ -552,7 +552,7 @@ function TeamCard({
           <button
             type="button"
             aria-pressed={concealed}
-            className={`rounded-full border px-3 py-1.5 font-display text-[13px] transition ${
+            className={`rounded-full border px-3 py-1.5 font-display text-[0.8125rem] transition ${
               concealed
                 ? "border-accent bg-accent font-bold text-on-accent"
                 : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
@@ -612,7 +612,7 @@ function Counter({
 }) {
   return (
     <div className="flex items-center gap-2 border-b border-muted/15 py-2">
-      <span className="flex-1 text-[15px]">{label}</span>
+      <span className="flex-1 text-[0.9375rem]">{label}</span>
       <IconButton
         className="!w-9 py-1.5"
         disabled={value <= 0}
@@ -651,7 +651,7 @@ function NumberRow({
 }) {
   return (
     <label className="flex items-center gap-2 border-b border-muted/15 py-2">
-      <span className="flex-1 text-[15px]">{label}</span>
+      <span className="flex-1 text-[0.9375rem]">{label}</span>
       <TextInput
         type="number"
         inputMode="numeric"
@@ -682,7 +682,7 @@ function HandChips({
           type="button"
           aria-current={index === editing ? "step" : undefined}
           aria-label={`Edit hand ${index + 1}`}
-          className={`rounded-full border px-3 py-1.5 font-display text-[13px] transition ${
+          className={`rounded-full border px-3 py-1.5 font-display text-[0.8125rem] transition ${
             index === editing
               ? "border-accent bg-accent font-bold text-on-accent"
               : "border-accent/55 text-accent hover:bg-accent/10"

@@ -217,10 +217,10 @@ export default function Phase10() {
               return (
                 <div key={index} className="border-b border-muted/15 py-2.5 last:border-b-0">
                   <div className="mb-1.5 flex items-baseline gap-2">
-                    <span className="flex-1 text-[17px]">{player}</span>
-                    <span className="text-[13px] text-muted">{totals[index]} pts</span>
+                    <span className="flex-1 text-[1.0625rem]">{player}</span>
+                    <span className="text-[0.8125rem] text-muted">{totals[index]} pts</span>
                   </div>
-                  <div className="mb-2 text-[13px] text-accent">
+                  <div className="mb-2 text-[0.8125rem] text-accent">
                     {done ? "Completed all ten" : `Phase ${playerPhase} — ${phaseDescription(playerPhase)}`}
                   </div>
                   <div className="flex items-center gap-2">
@@ -236,7 +236,7 @@ export default function Phase10() {
                           ),
                         }))
                       }
-                      className={`flex-1 rounded-lg border py-2 font-display text-[13px] transition disabled:opacity-40 ${
+                      className={`flex-1 rounded-lg border py-2 font-display text-[0.8125rem] transition disabled:opacity-40 ${
                         entry[index]?.completed
                           ? "border-accent bg-accent font-bold text-on-accent"
                           : "border-muted/35 text-muted enabled:hover:border-accent/55 enabled:hover:text-accent"
@@ -302,7 +302,7 @@ export default function Phase10() {
                     .join(" & ")
                 : "—"}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-muted">
+            <p className="mb-5 mt-0.5 text-[0.9375rem] text-muted">
               through all {FINAL_PHASE} phases
               {winners.length > 0 && ` with ${winners[0].total} points`}
             </p>
@@ -341,16 +341,16 @@ function PhaseStandings({
       {rows.map((row, index) => (
         <li
           key={row.name}
-          className={`flex items-baseline gap-2.5 py-1.5 text-[17px] ${
+          className={`flex items-baseline gap-2.5 py-1.5 text-[1.0625rem] ${
             row.finished ? "text-accent" : ""
           }`}
         >
-          <span className="w-[18px] shrink-0 text-[13px] text-muted">{index + 1}</span>
+          <span className="w-[18px] shrink-0 text-[0.8125rem] text-muted">{index + 1}</span>
           <span className="flex-1">
             {row.finished && <span aria-hidden="true">♛ </span>}
             {row.name}
           </span>
-          <span className="text-[13px] text-muted">
+          <span className="text-[0.8125rem] text-muted">
             {row.finished ? "done" : `phase ${row.phase}`}
           </span>
           <span className="font-display text-lg font-bold tabular-nums">{row.total}</span>
@@ -378,7 +378,7 @@ function RoundChips({
           aria-current={index === editing ? "step" : undefined}
           aria-label={`Edit round ${index + 1}`}
           onClick={() => onEdit(index)}
-          className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[13px] transition ${
+          className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[0.8125rem] transition ${
             index === editing
               ? "border-accent bg-accent font-bold text-on-accent"
               : "border-accent/55 text-accent hover:bg-accent/10"

@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getApp, APPS, APP_COMPONENTS } from "@/lib/registry";
 import { ThemePicker } from "@/components/ThemePicker";
+import { FontSizePicker } from "@/components/FontSizePicker";
 import { RulesPanel } from "@/components/RulesPanel";
 import { getRules } from "@/lib/rules";
 
@@ -43,7 +44,7 @@ export default async function AppPage({ params }: Props) {
         >
           <span aria-hidden="true">←</span> All apps
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
           {rules && (
             <a
               href="#rules"
@@ -53,6 +54,7 @@ export default async function AppPage({ params }: Props) {
             </a>
           )}
           <ThemePicker />
+          <FontSizePicker />
         </div>
       </nav>
       <AppComponent />

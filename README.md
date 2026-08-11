@@ -62,7 +62,12 @@ Two details worth knowing:
   first. It also means pages stay statically generated — reading the preference
   server-side would force every route to render per-request.
 - **Contrast is checked, not assumed.** Every text/background pair in every
-  theme meets WCAG AA (4.5:1); the tightest is 5.3:1.
+  theme meets WCAG AA (4.5:1), validated by computing the ratios against the
+  composited panel surfaces whenever the palette changes.
+- **Text size is adjustable.** Four sizes (100% to 137.5%) via the "A" buttons
+  beside the theme picker, remembered per browser and applied before first
+  paint by the same boot script as the theme. The whole layout is rem-based, so
+  text and spacing scale together like browser zoom.
 
 Changing the theme in one tab updates any other open tab, via the `storage`
 event in [`lib/theme-client.ts`](lib/theme-client.ts).

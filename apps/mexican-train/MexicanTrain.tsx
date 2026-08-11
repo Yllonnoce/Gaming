@@ -200,7 +200,7 @@ export default function MexicanTrain() {
                     >
                       {option.name}
                     </span>
-                    <span className="mt-0.5 block text-[13px] leading-snug text-muted">
+                    <span className="mt-0.5 block text-[0.8125rem] leading-snug text-muted">
                       {option.tiles} tiles · {option.highestDouble + 1} hands
                       <br />
                       up to {option.maxPlayers} players
@@ -296,16 +296,16 @@ export default function MexicanTrain() {
                   }`}
                 />
               </button>
-              <span className="flex-1 text-[15px]">
+              <span className="flex-1 text-[0.9375rem]">
                 Double-blank penalty
-                <span className="mt-0.5 block text-[13px] text-muted">
+                <span className="mt-0.5 block text-[0.8125rem] text-muted">
                   The 0-0 tile scores a fixed penalty instead of nothing.
                 </span>
               </span>
             </label>
 
             {state.draftBlankRule && (
-              <label className="mt-3 flex items-center gap-3 border-t border-muted/15 pt-3 text-[15px]">
+              <label className="mt-3 flex items-center gap-3 border-t border-muted/15 pt-3 text-[0.9375rem]">
                 <span className="flex-1 text-muted">Penalty value</span>
                 <TextInput
                   type="number"
@@ -363,7 +363,7 @@ export default function MexicanTrain() {
                 key={playerIndex}
                 className="flex items-center gap-2 border-b border-muted/15 py-2 last:border-b-0"
               >
-                <span className="flex-1 text-[17px]">{player}</span>
+                <span className="flex-1 text-[1.0625rem]">{player}</span>
 
                 {blankPenalty !== null && (
                   <button
@@ -374,7 +374,7 @@ export default function MexicanTrain() {
                     onClick={() =>
                       updateCell(playerIndex, { blank: !entry[playerIndex]?.blank })
                     }
-                    className={`rounded-full border px-2.5 py-1 font-display text-[13px] transition ${
+                    className={`rounded-full border px-2.5 py-1 font-display text-[0.8125rem] transition ${
                       entry[playerIndex]?.blank
                         ? "border-accent bg-accent font-bold text-on-accent"
                         : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
@@ -397,7 +397,7 @@ export default function MexicanTrain() {
               </div>
             ))}
 
-            <p className="mt-2.5 text-center text-[13px] text-muted">
+            <p className="mt-2.5 text-center text-[0.8125rem] text-muted">
               Leave a player blank if they went out — an empty hand scores nothing.
             </p>
 
@@ -436,7 +436,7 @@ export default function MexicanTrain() {
             <h2 className="mt-2 font-display text-3xl font-bold tracking-wide">
               {winners.map((w) => w.name).join(" & ")}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-muted">
+            <p className="mb-5 mt-0.5 text-[0.9375rem] text-muted">
               {winners.length > 1 ? "tie the crown" : "takes the crown"} with {bestTotal} pips
             </p>
             <div className="text-left">
@@ -505,7 +505,7 @@ function HandChips({
             aria-current={active ? "step" : undefined}
             aria-label={`Edit ${engineLabel(engine).toLowerCase()} hand`}
             onClick={() => onJump(index)}
-            className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[13px] transition ${
+            className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[0.8125rem] transition ${
               active
                 ? "border-accent bg-accent font-bold text-on-accent"
                 : isRecorded(index)

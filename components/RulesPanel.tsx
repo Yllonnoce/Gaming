@@ -25,12 +25,12 @@ export function RulesPanel({ rules, title }: { rules: Rules; title: string }) {
       </summary>
 
       <div className="border-t border-muted/15 px-4 pb-5 pt-4">
-        <dl className="mb-5 grid gap-2 text-[15px] sm:grid-cols-[auto_1fr] sm:gap-x-4">
-          <dt className="font-display text-[13px] uppercase tracking-wide text-muted">Object</dt>
+        <dl className="mb-5 grid gap-2 text-[0.9375rem] sm:grid-cols-[auto_1fr] sm:gap-x-4">
+          <dt className="font-display text-[0.8125rem] uppercase tracking-wide text-muted">Object</dt>
           <dd className="mb-2 sm:mb-0">{rules.objective}</dd>
-          <dt className="font-display text-[13px] uppercase tracking-wide text-muted">Players</dt>
+          <dt className="font-display text-[0.8125rem] uppercase tracking-wide text-muted">Players</dt>
           <dd className="mb-2 sm:mb-0">{rules.players}</dd>
-          <dt className="font-display text-[13px] uppercase tracking-wide text-muted">You need</dt>
+          <dt className="font-display text-[0.8125rem] uppercase tracking-wide text-muted">You need</dt>
           <dd>{rules.equipment}</dd>
         </dl>
 
@@ -39,7 +39,7 @@ export function RulesPanel({ rules, title }: { rules: Rules; title: string }) {
         {rules.terms && rules.terms.length > 0 && (
           <section className="mb-5">
             <h3 className="label-caps mb-2">Words you&rsquo;ll hear</h3>
-            <dl className="space-y-1.5 text-[15px] leading-relaxed">
+            <dl className="space-y-1.5 text-[0.9375rem] leading-relaxed">
               {rules.terms.map((entry) => (
                 <div key={entry.term}>
                   <dt className="inline font-display font-bold text-accent">{entry.term}</dt>
@@ -62,7 +62,7 @@ export function RulesPanel({ rules, title }: { rules: Rules; title: string }) {
         {rules.appNotes && rules.appNotes.length > 0 && (
           <section className="mt-5 border-t border-muted/15 pt-4">
             <h3 className="label-caps mb-2">What this scorekeeper assumes</h3>
-            <ul className="ml-4 list-disc space-y-1.5 text-[15px] text-muted marker:text-accent/60">
+            <ul className="ml-4 list-disc space-y-1.5 text-[0.9375rem] text-muted marker:text-accent/60">
               {rules.appNotes.map((note, index) => (
                 <li key={index}>{note}</li>
               ))}
@@ -77,11 +77,11 @@ export function RulesPanel({ rules, title }: { rules: Rules; title: string }) {
 function Block({ block }: { block: RulesBlock }) {
   switch (block.kind) {
     case "text":
-      return <p className="mb-2.5 text-[15px] leading-relaxed last:mb-0">{block.text}</p>;
+      return <p className="mb-2.5 text-[0.9375rem] leading-relaxed last:mb-0">{block.text}</p>;
 
     case "list":
       return (
-        <ul className="mb-2.5 ml-4 list-disc space-y-1.5 text-[15px] leading-relaxed last:mb-0 marker:text-accent/60">
+        <ul className="mb-2.5 ml-4 list-disc space-y-1.5 text-[0.9375rem] leading-relaxed last:mb-0 marker:text-accent/60">
           {block.items.map((item, index) => (
             <li key={index}>{item}</li>
           ))}
@@ -90,7 +90,7 @@ function Block({ block }: { block: RulesBlock }) {
 
     case "steps":
       return (
-        <ol className="mb-2.5 ml-4 list-decimal space-y-1.5 text-[15px] leading-relaxed last:mb-0 marker:font-display marker:text-accent/60">
+        <ol className="mb-2.5 ml-4 list-decimal space-y-1.5 text-[0.9375rem] leading-relaxed last:mb-0 marker:font-display marker:text-accent/60">
           {block.items.map((item, index) => (
             <li key={index}>{item}</li>
           ))}
@@ -102,9 +102,9 @@ function Block({ block }: { block: RulesBlock }) {
         // Wide tables scroll inside their own box rather than pushing the page
         // sideways on a phone.
         <div className="mb-2.5 overflow-x-auto last:mb-0">
-          <table className="w-full min-w-[18rem] border-collapse text-[15px]">
+          <table className="w-full min-w-[18rem] border-collapse text-[0.9375rem]">
             {block.table.caption && (
-              <caption className="mb-1.5 text-left text-[13px] text-muted">
+              <caption className="mb-1.5 text-left text-[0.8125rem] text-muted">
                 {block.table.caption}
               </caption>
             )}
@@ -114,7 +114,7 @@ function Block({ block }: { block: RulesBlock }) {
                   <th
                     key={column}
                     scope="col"
-                    className={`border-b border-muted/25 py-1.5 pr-3 font-display text-[13px] uppercase tracking-wide text-muted ${
+                    className={`border-b border-muted/25 py-1.5 pr-3 font-display text-[0.8125rem] uppercase tracking-wide text-muted ${
                       index === 0 ? "text-left" : "text-right"
                     }`}
                   >

@@ -252,7 +252,7 @@ export default function FiveCrowns() {
                 key={playerIndex}
                 className="flex items-center gap-2.5 border-b border-muted/15 py-2 last:border-b-0"
               >
-                <label className="flex-1 text-[17px] font-medium" htmlFor={`score-${playerIndex}`}>
+                <label className="flex-1 text-[1.0625rem] font-medium" htmlFor={`score-${playerIndex}`}>
                   {player}
                 </label>
                 <input
@@ -302,7 +302,7 @@ export default function FiveCrowns() {
             <h2 className="mt-2 font-display text-3xl font-bold tracking-wide">
               {winners.map((w) => w.name).join(" & ")}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-muted">
+            <p className="mb-5 mt-0.5 text-[0.9375rem] text-muted">
               {winners.length > 1 ? "tie the crown" : "takes the crown"} with {bestTotal}{" "}
               points
             </p>
@@ -339,11 +339,11 @@ function WildCard({ wild }: { wild: string }) {
       className="relative h-[82px] w-[58px] flex-shrink-0 -rotate-6 rounded-md bg-card font-display font-bold text-card-ink shadow-[3px_4px_0_rgba(0,0,0,0.35)] transition-transform duration-200 hover:rotate-0 motion-reduce:transition-none"
       aria-hidden="true"
     >
-      <span className="absolute left-[7px] top-[5px] text-[15px] leading-none">{wild}</span>
+      <span className="absolute left-[7px] top-[5px] text-[0.9375rem] leading-none">{wild}</span>
       <span className="absolute inset-0 flex items-center justify-center text-3xl text-accent">
         ♛
       </span>
-      <span className="absolute bottom-[5px] right-[7px] rotate-180 text-[15px] leading-none">
+      <span className="absolute bottom-[5px] right-[7px] rotate-180 text-[0.9375rem] leading-none">
         {wild}
       </span>
     </div>
@@ -370,7 +370,7 @@ function RoundChips({
             type="button"
             aria-current={active ? "step" : undefined}
             aria-label={`Round ${round.num}, ${round.wild}s wild${done ? ", scored" : ""}`}
-            className={`rounded-full border px-2.5 py-1.5 font-display text-[13px] transition ${
+            className={`rounded-full border px-2.5 py-1.5 font-display text-[0.8125rem] transition ${
               active
                 ? "border-accent bg-accent font-bold text-on-accent"
                 : done

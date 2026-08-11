@@ -249,7 +249,7 @@ export function SimpleScorekeeper({ config }: { config: SimpleConfig }) {
                       onClick={() =>
                         setState((previous) => ({ ...previous, draftLength: String(choice) }))
                       }
-                      className={`flex-1 rounded-lg border py-2.5 font-display text-[15px] transition ${
+                      className={`flex-1 rounded-lg border py-2.5 font-display text-[0.9375rem] transition ${
                         selected
                           ? "border-accent bg-accent font-bold text-on-accent"
                           : "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
@@ -306,7 +306,7 @@ export function SimpleScorekeeper({ config }: { config: SimpleConfig }) {
                 key={index}
                 className="flex items-center gap-2 border-b border-muted/15 py-2 last:border-b-0"
               >
-                <span className="flex-1 text-[17px]">{player}</span>
+                <span className="flex-1 text-[1.0625rem]">{player}</span>
                 <TextInput
                   type="number"
                   inputMode="numeric"
@@ -363,7 +363,7 @@ export function SimpleScorekeeper({ config }: { config: SimpleConfig }) {
             <h2 className="mt-2 font-display text-3xl font-bold tracking-wide">
               {winners.map((w) => w.name).join(" & ")}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-muted">
+            <p className="mb-5 mt-0.5 text-[0.9375rem] text-muted">
               {winners.length > 1 ? "tie the crown" : "takes the crown"} with {bestTotal} points
             </p>
             <div className="text-left">
@@ -419,7 +419,7 @@ function RoundChips({
             aria-current={active ? "step" : undefined}
             aria-label={`Edit round ${index + 1}`}
             onClick={() => onJump(index)}
-            className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[13px] transition ${
+            className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[0.8125rem] transition ${
               active
                 ? "border-accent bg-accent font-bold text-on-accent"
                 : isRecorded(index)

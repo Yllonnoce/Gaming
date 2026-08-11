@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cinzel, Alegreya_Sans } from "next/font/google";
 import { SITE } from "@/lib/site";
-import { THEME_BOOT_SCRIPT } from "@/lib/themes";
+import { DISPLAY_BOOT_SCRIPT } from "@/lib/themes";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -27,7 +27,7 @@ export const viewport: Viewport = {
   // The default palette's mid tone. Reading the chosen theme here would force
   // every page to render per-request and lose static generation, which is a bad
   // trade for the colour of the mobile browser chrome.
-  themeColor: "#241539",
+  themeColor: "#382558",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* Blocking on purpose. It must run before the body paints, or every
             visitor on a non-default theme sees a flash of Midnight. */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: DISPLAY_BOOT_SCRIPT }} />
       </head>
       <body className="antialiased">{children}</body>
     </html>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SITE } from "@/lib/site";
 import { visibleApps, CATEGORY_LABELS, CATEGORY_ORDER, type AppManifest } from "@/lib/registry";
 import { ThemePicker } from "@/components/ThemePicker";
+import { FontSizePicker } from "@/components/FontSizePicker";
 import { currentUserId } from "@/lib/session";
 import { touchUser } from "@/lib/store";
 
@@ -34,8 +35,9 @@ export default async function HubPage() {
           {SITE.name}
         </h1>
         <p className="mt-2 text-muted">{SITE.tagline}</p>
-        <div className="mt-5 flex justify-center">
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
           <ThemePicker />
+          <FontSizePicker />
         </div>
       </header>
 

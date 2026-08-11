@@ -277,20 +277,20 @@ export default function Spades() {
             <h2 className="mt-2 font-display text-3xl font-bold tracking-wide">
               {winners.map((w) => w.name).join(" & ")}
             </h2>
-            <p className="mb-5 mt-0.5 text-[15px] text-muted">
+            <p className="mb-5 mt-0.5 text-[0.9375rem] text-muted">
               {winners.length > 1 ? "tie" : "wins"} with {bestScore} points
             </p>
             <ol className="text-left">
               {ranked.map((team, index) => (
                 <li
                   key={team.name}
-                  className={`flex items-baseline gap-2.5 py-1.5 text-[17px] ${
+                  className={`flex items-baseline gap-2.5 py-1.5 text-[1.0625rem] ${
                     team.score === bestScore ? "text-accent" : ""
                   }`}
                 >
-                  <span className="w-[18px] shrink-0 text-[13px] text-muted">{index + 1}</span>
+                  <span className="w-[18px] shrink-0 text-[0.8125rem] text-muted">{index + 1}</span>
                   <span className="flex-1">{team.name}</span>
-                  <span className="text-[13px] text-muted">{team.bags} bags</span>
+                  <span className="text-[0.8125rem] text-muted">{team.bags} bags</span>
                   <span className="font-display text-lg font-bold tabular-nums">{team.score}</span>
                 </li>
               ))}
@@ -334,7 +334,7 @@ function TeamCard({
     <div className="panel mb-3 p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-muted/15 pb-2.5">
         <span className="font-display text-lg font-bold tracking-wide">{teamLabel(team)}</span>
-        <span className="text-right text-[13px] leading-tight text-muted">
+        <span className="text-right text-[0.8125rem] leading-tight text-muted">
           {progress.score} pts
           <br />
           <span className={bagsToPenalty <= 2 ? "text-accent" : "text-muted/70"}>
@@ -345,7 +345,7 @@ function TeamCard({
 
       <div className="mb-2 flex gap-2">
         <label className="flex flex-1 items-center gap-2">
-          <span className="flex-1 text-[15px]">Bid</span>
+          <span className="flex-1 text-[0.9375rem]">Bid</span>
           <TextInput
             type="number"
             inputMode="numeric"
@@ -358,7 +358,7 @@ function TeamCard({
           />
         </label>
         <label className="flex flex-1 items-center gap-2">
-          <span className="flex-1 text-[15px]">Took</span>
+          <span className="flex-1 text-[0.9375rem]">Took</span>
           <TextInput
             type="number"
             inputMode="numeric"
@@ -379,11 +379,11 @@ function TeamCard({
         const next = cycle[(cycle.indexOf(kind) + 1) % cycle.length];
         return (
           <div key={seat} className="flex items-center gap-2 border-t border-muted/15 py-2">
-            <span className="flex-1 text-[15px] text-muted">{player}</span>
+            <span className="flex-1 text-[0.9375rem] text-muted">{player}</span>
             <button
               type="button"
               onClick={() => onChange({ nils: hand.nils.map((n, i) => (i === seat ? next : n)) })}
-              className={`rounded-full border px-3 py-1 font-display text-[13px] transition ${
+              className={`rounded-full border px-3 py-1 font-display text-[0.8125rem] transition ${
                 kind === "none"
                   ? "border-muted/35 text-muted hover:border-accent/55 hover:text-accent"
                   : "border-accent bg-accent font-bold text-on-accent"
@@ -398,7 +398,7 @@ function TeamCard({
                 onClick={() =>
                   onChange({ nilMade: hand.nilMade.map((m, i) => (i === seat ? !m : m)) })
                 }
-                className={`rounded-full border px-3 py-1 font-display text-[13px] transition ${
+                className={`rounded-full border px-3 py-1 font-display text-[0.8125rem] transition ${
                   hand.nilMade[seat]
                     ? "border-accent bg-accent font-bold text-on-accent"
                     : "border-muted/35 text-muted hover:border-accent/55"
@@ -457,7 +457,7 @@ function HandChips({
           aria-current={index === editing ? "step" : undefined}
           aria-label={`Edit hand ${index + 1}`}
           onClick={() => onEdit(index)}
-          className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[13px] transition ${
+          className={`min-w-9 rounded-full border px-2.5 py-1.5 font-display text-[0.8125rem] transition ${
             index === editing
               ? "border-accent bg-accent font-bold text-on-accent"
               : "border-accent/55 text-accent hover:bg-accent/10"
