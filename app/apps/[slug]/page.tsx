@@ -43,7 +43,17 @@ export default async function AppPage({ params }: Props) {
         >
           <span aria-hidden="true">←</span> All apps
         </Link>
-        <ThemePicker />
+        <div className="flex items-center gap-4">
+          {rules && (
+            <a
+              href="#rules"
+              className="text-sm text-muted underline underline-offset-2 transition hover:text-accent"
+            >
+              How to play
+            </a>
+          )}
+          <ThemePicker />
+        </div>
       </nav>
       <AppComponent />
       {rules && <RulesPanel rules={rules} title={app.title} />}

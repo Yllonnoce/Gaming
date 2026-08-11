@@ -4,6 +4,36 @@ export const rules: Rules = {
   "objective": "Bid for the right to name trump, then score enough from your melds and your tricks to make good on that bid. Fall short and you lose the whole bid. First partnership to 1,500 wins.",
   "players": "4, in two partnerships sitting opposite each other.",
   "equipment": "A 48-card pinochle deck: A, 10, K, Q, J and 9 in each suit, two copies of each. You can build one from two standard decks by removing everything below the nine.",
+  "terms": [
+    {
+      "term": "Trump",
+      "meaning": "the suit named by the winner of the bidding. It outranks the other three."
+    },
+    {
+      "term": "Meld",
+      "meaning": "the scoring combinations shown face up and counted before a single trick is played."
+    },
+    {
+      "term": "Marriage",
+      "meaning": "a king and queen of one suit. Royal when they're in trump."
+    },
+    {
+      "term": "Pinochle",
+      "meaning": "the jack of diamonds together with the queen of spades."
+    },
+    {
+      "term": "Around",
+      "meaning": "one of a rank in every suit — as in aces around."
+    },
+    {
+      "term": "Dix",
+      "meaning": "the nine of trump. Pronounced deece."
+    },
+    {
+      "term": "Set",
+      "meaning": "failing to make your bid. The whole bid is subtracted, and your meld counts for nothing."
+    }
+  ],
   "sections": [
     {
       "heading": "The unusual card ranking",

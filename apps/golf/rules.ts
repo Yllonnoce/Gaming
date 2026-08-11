@@ -4,6 +4,20 @@ export const rules: Rules = {
   "objective": "Finish with the lowest total, exactly like the real sport. You play nine or eighteen holes, and each hole is one deal.",
   "players": "2 to 8. Shuffle in a second deck beyond four players.",
   "equipment": "A standard 52-card deck. These are the rules for six-card golf, the most widely played form.",
+  "terms": [
+    {
+      "term": "Layout",
+      "meaning": "your six cards in two rows of three. It never grows or shrinks."
+    },
+    {
+      "term": "Column",
+      "meaning": "a vertical pair in your layout. Two cards of the same rank in a column cancel to zero."
+    },
+    {
+      "term": "Hole",
+      "meaning": "one full deal, scored and added up like a hole of golf."
+    }
+  ],
   "sections": [
     {
       "heading": "Setting up a hole",

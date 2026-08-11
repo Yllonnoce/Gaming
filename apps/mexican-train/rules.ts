@@ -4,6 +4,32 @@ export const rules: Rules = {
   "objective": "Be caught holding the fewest pips. You play one hand per double, and each time a hand ends you add up whatever tiles are still in your hand. Low is good.",
   "players": "2 to 8 with a double-12 set, 2 to 10 with a double-15.",
   "equipment": "A double-12 set (91 tiles) or a double-15 set (136 tiles). A hub or centrepiece to hold the engine helps, and each player needs a marker — a coin or button will do.",
+  "terms": [
+    {
+      "term": "Engine",
+      "meaning": "the double sitting in the hub. Every train this hand grows from it."
+    },
+    {
+      "term": "Personal train",
+      "meaning": "your own line of tiles. Only you may play on it while it stays private."
+    },
+    {
+      "term": "Mexican Train",
+      "meaning": "the one communal line. Anyone may play on it at any time."
+    },
+    {
+      "term": "Public train",
+      "meaning": "a train whose owner couldn't play. It's marked, and open to everyone until they play on it again."
+    },
+    {
+      "term": "Boneyard",
+      "meaning": "the face-down pile of leftover tiles you draw from when stuck."
+    },
+    {
+      "term": "Satisfying a double",
+      "meaning": "covering a just-played double. Nobody may play anywhere else until it's done."
+    }
+  ],
   "sections": [
     {
       "heading": "How many hands you play",

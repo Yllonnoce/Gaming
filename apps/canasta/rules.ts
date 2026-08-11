@@ -4,6 +4,32 @@ export const rules: Rules = {
   "objective": "Be the first partnership to 5,000 points. Almost all of that comes from canastas — melds of seven or more cards — so the game is about building long melds rather than going out quickly.",
   "players": "4, in two partnerships sitting opposite each other. Two- and three-player versions exist. This scorekeeper handles up to four partnerships.",
   "equipment": "Two standard 52-card decks plus their four jokers, shuffled together — 108 cards.",
+  "terms": [
+    {
+      "term": "Meld",
+      "meaning": "three or more cards of the same rank, laid face up. Melds belong to the partnership, not the player."
+    },
+    {
+      "term": "Canasta",
+      "meaning": "a meld grown to seven or more cards. Natural means no wild cards; mixed means one to three."
+    },
+    {
+      "term": "Wild card",
+      "meaning": "jokers and twos. They stand in for any rank."
+    },
+    {
+      "term": "Frozen pile",
+      "meaning": "a discard pile that can only be taken by holding two natural cards matching its top card."
+    },
+    {
+      "term": "Red three",
+      "meaning": "an automatic bonus card. Laid down the moment you get one, and never part of a meld."
+    },
+    {
+      "term": "Going out",
+      "meaning": "playing every card in your hand, allowed only once your side has completed a canasta."
+    }
+  ],
   "sections": [
     {
       "heading": "The deal",

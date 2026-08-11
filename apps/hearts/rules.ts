@@ -4,6 +4,24 @@ export const rules: Rules = {
   "objective": "Avoid taking points. Every heart costs one and the queen of spades costs thirteen. The lowest score when someone hits 100 wins — so this is a game you win by losing.",
   "players": "3 to 6, though four is the classic game.",
   "equipment": "A standard 52-card deck. Aces are high; there is no trump suit.",
+  "terms": [
+    {
+      "term": "Trick",
+      "meaning": "one round of everyone playing a single card. The highest card of the suit led takes it."
+    },
+    {
+      "term": "Following suit",
+      "meaning": "playing the same suit as the card led. Required whenever you can."
+    },
+    {
+      "term": "Breaking hearts",
+      "meaning": "the first time a heart is discarded on another suit's trick. Hearts may not be led before this happens."
+    },
+    {
+      "term": "Shooting the moon",
+      "meaning": "taking all 26 points in one hand — which reverses them onto your opponents."
+    }
+  ],
   "sections": [
     {
       "heading": "The deal",

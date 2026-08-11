@@ -4,6 +4,24 @@ export const rules: Rules = {
   "objective": "Bank 10,000 points before anyone else. The catch is that you can keep rolling for more, and one bad roll takes away everything you have not banked.",
   "players": "2 or more",
   "equipment": "Six dice, and something to keep score on.",
+  "terms": [
+    {
+      "term": "Bank",
+      "meaning": "ending your turn and keeping the points accumulated so far."
+    },
+    {
+      "term": "Farkle",
+      "meaning": "a roll containing no scoring dice. Your turn ends and everything unbanked is lost."
+    },
+    {
+      "term": "Hot dice",
+      "meaning": "all six dice scoring. Pick them all up and keep rolling with your total intact."
+    },
+    {
+      "term": "On the board",
+      "meaning": "having banked the entry threshold — usually 500 in a single turn — so your points start counting."
+    }
+  ],
   "sections": [
     {
       "heading": "The basic idea",

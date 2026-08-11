@@ -9,8 +9,12 @@ import type { Rules, RulesBlock } from "@/lib/rules";
  */
 export function RulesPanel({ rules, title }: { rules: Rules; title: string }) {
   return (
-    <details className="panel group mt-6 overflow-hidden">
-      <summary className="flex cursor-pointer list-none items-center gap-2 p-4 font-display text-xs uppercase tracking-[0.16em] text-accent transition hover:bg-accent/5">
+    // scroll-mt keeps the panel clear of the viewport edge when jumped to via
+    // the #rules link in the page nav.
+    <details id="rules" className="panel group mt-6 scroll-mt-4 overflow-hidden">
+      {/* list-none hides the marker in most browsers; Safari needs the
+          ::-webkit-details-marker override or it draws its own as well. */}
+      <summary className="flex cursor-pointer list-none items-center gap-2 p-4 font-display text-xs uppercase tracking-[0.16em] text-accent transition hover:bg-accent/5 [&::-webkit-details-marker]:hidden">
         <span
           className="inline-block transition-transform group-open:rotate-90 motion-reduce:transition-none"
           aria-hidden="true"
@@ -29,6 +33,22 @@ export function RulesPanel({ rules, title }: { rules: Rules; title: string }) {
           <dt className="font-display text-[13px] uppercase tracking-wide text-muted">You need</dt>
           <dd>{rules.equipment}</dd>
         </dl>
+
+        {/* Vocabulary first: the sections below use these words freely, and a
+            first-time player should meet them before the rules lean on them. */}
+        {rules.terms && rules.terms.length > 0 && (
+          <section className="mb-5">
+            <h3 className="label-caps mb-2">Words you&rsquo;ll hear</h3>
+            <dl className="space-y-1.5 text-[15px] leading-relaxed">
+              {rules.terms.map((entry) => (
+                <div key={entry.term}>
+                  <dt className="inline font-display font-bold text-accent">{entry.term}</dt>
+                  <dd className="inline"> — {entry.meaning}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
 
         {rules.sections.map((section) => (
           <section key={section.heading} className="mb-5 last:mb-0">

@@ -4,6 +4,32 @@ export const rules: Rules = {
   "objective": "Say how many tricks you will take, then take exactly that many. Overshooting is punished as surely as falling short. First partnership to 500 wins.",
   "players": "4, in two partnerships sitting opposite each other.",
   "equipment": "A standard 52-card deck. Aces are high, and spades are permanently trump.",
+  "terms": [
+    {
+      "term": "Trick",
+      "meaning": "one card from each player. The highest spade wins it; if none was played, the highest card of the suit led."
+    },
+    {
+      "term": "Trump",
+      "meaning": "spades, always. Any spade beats any card of another suit."
+    },
+    {
+      "term": "Contract",
+      "meaning": "a partnership's combined bid — the tricks it has promised to take."
+    },
+    {
+      "term": "Set",
+      "meaning": "failing your contract. You lose ten points per trick bid, and nothing else that hand counts."
+    },
+    {
+      "term": "Bag",
+      "meaning": "each trick taken above the contract. Worth one point now; the tenth accumulated costs 100."
+    },
+    {
+      "term": "Nil",
+      "meaning": "a bid to take no tricks at all. Blind nil is the same bid made before looking at your cards."
+    }
+  ],
   "sections": [
     {
       "heading": "The deal",

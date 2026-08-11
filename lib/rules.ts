@@ -23,11 +23,22 @@ export type RulesSection = {
   blocks: RulesBlock[];
 };
 
+export type RulesTerm = {
+  term: string;
+  meaning: string;
+};
+
 export type Rules = {
   /** One sentence: how you win. */
   objective: string;
   players: string;
   equipment: string;
+  /**
+   * The game's vocabulary, defined up front. The sections below use these
+   * words freely, so a first-time player reads this list before the rules
+   * start leaning on it.
+   */
+  terms?: RulesTerm[];
   sections: RulesSection[];
   /**
    * Where this scorekeeper commits to one reading of a rule that tables vary

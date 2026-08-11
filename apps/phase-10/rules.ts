@@ -4,6 +4,28 @@ export const rules: Rules = {
   "objective": "Be the first to complete all ten phases, in order. Your score is only a tiebreaker — it decides nothing unless two people finish in the same round.",
   "players": "2 to 6",
   "equipment": "A Phase 10 deck: 108 cards. Numbers 1 to 12 in four colours, two of each — 96 cards — plus eight Skip cards and four Wild cards.",
+  "terms": [
+    {
+      "term": "Phase",
+      "meaning": "the specific combination you must lay down this round. Everyone works through the same ten, in order."
+    },
+    {
+      "term": "Set",
+      "meaning": "cards of the same number. Colours are irrelevant."
+    },
+    {
+      "term": "Run",
+      "meaning": "consecutive numbers. Colours are irrelevant."
+    },
+    {
+      "term": "Hitting",
+      "meaning": "adding single cards to any phase already on the table — allowed only once your own phase is down."
+    },
+    {
+      "term": "Going out",
+      "meaning": "emptying your hand, which ends the round. Separate from completing your phase: you can do either without the other."
+    }
+  ],
   "sections": [
     {
       "heading": "The ten phases",

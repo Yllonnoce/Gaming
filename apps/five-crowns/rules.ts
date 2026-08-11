@@ -4,6 +4,28 @@ export const rules: Rules = {
   "objective": "Finish the eleven rounds with the lowest total. You only ever score the cards left in your hand, so the game is a race to get rid of everything.",
   "players": "2 to 7",
   "equipment": "A Five Crowns deck: 116 cards. It is two identical 58-card decks shuffled together. Each has five suits — stars, hearts, clubs, diamonds and spades — running 3 up to King, plus three jokers. So there are six jokers in all, and no aces or twos.",
+  "terms": [
+    {
+      "term": "Book",
+      "meaning": "three or more cards of the same rank. Suits don't matter and may repeat, since the deck has two of every card."
+    },
+    {
+      "term": "Run",
+      "meaning": "three or more cards in sequence in a single suit, like 5-6-7 of stars."
+    },
+    {
+      "term": "Wild",
+      "meaning": "a card that stands in for anything: every joker, plus whichever rank matches the round."
+    },
+    {
+      "term": "Going out",
+      "meaning": "laying down your entire hand at once. It ends the round for everyone else."
+    },
+    {
+      "term": "Stock",
+      "meaning": "the face-down pile you draw from. The discard pile sits face up beside it."
+    }
+  ],
   "sections": [
     {
       "heading": "The shape of the game",

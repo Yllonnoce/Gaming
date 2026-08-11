@@ -4,6 +4,28 @@ export const rules: Rules = {
   "objective": "Score points by melding sets and runs, and avoid being caught holding cards when someone goes out. First to 500 wins.",
   "players": "2 to 6",
   "equipment": "A standard 52-card deck for up to four players. For five or more, shuffle two decks together. Jokers are optional.",
+  "terms": [
+    {
+      "term": "Set",
+      "meaning": "three or more cards of the same rank."
+    },
+    {
+      "term": "Run",
+      "meaning": "three or more consecutive cards of one suit."
+    },
+    {
+      "term": "Meld",
+      "meaning": "laying a set or run face up on the table. Melded cards score for you."
+    },
+    {
+      "term": "Laying off",
+      "meaning": "adding single cards to any meld already on the table, yours or an opponent's."
+    },
+    {
+      "term": "Going out",
+      "meaning": "melding or laying off your last card, which ends the hand."
+    }
+  ],
   "sections": [
     {
       "heading": "The deal",

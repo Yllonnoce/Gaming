@@ -181,9 +181,15 @@ same way and the panel needs no per-game markup.
 React state — it works before hydration and without JavaScript, which matters
 for the thing you reach for mid-game.
 
-Each set of rules ends with **what this scorekeeper assumes**: the places where
-the app commits to one reading of a rule that tables vary on. That section is
-there so the rules can never quietly contradict the arithmetic.
+Each game opens with **words you'll hear** — its vocabulary, defined before the
+rules start leaning on it — and ends with **what this scorekeeper assumes**: the
+places where the app commits to one reading of a rule that tables vary on.
+
+That promise is enforced, not aspirational:
+[`tests/rules-consistency.test.mts`](tests/rules-consistency.test.mts) pins the
+numbers in the rules to the constants in the scoring modules, so a rule change
+that is not also a code change fails `npm test`. A "How to play" link in each
+app's nav jumps to the panel.
 
 ## Adding an app
 
