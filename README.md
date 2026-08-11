@@ -44,10 +44,12 @@ at `data/gaming.db`, and the cookie secret falls back to a development default.
 
 ## Theming
 
-Six palettes: **Midnight** (default), **Forest**, **Sapphire**, **Ember**,
-**Slate**, and **Parchment** (the one light theme). The picker sits on the hub
-and on every app page; the choice is saved to `localStorage` and applies to the
-whole site.
+Six light palettes: **Lavender** (default), **Meadow**, **Sky**, **Peach**,
+**Mist**, and **Parchment** — soft tinted backgrounds with dark ink, differing
+in hue rather than brightness. The picker sits on the hub and on every app
+page; the choice is saved to `localStorage` and applies to the whole site.
+Theme ids in storage predate the light redesign, so a stored choice keeps
+working across it.
 
 Tokens are named by *role* rather than by colour — `accent`, `ink`, `muted`,
 `on-accent`, `well`, `card` — because the same class has to read correctly in

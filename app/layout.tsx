@@ -27,7 +27,7 @@ export const viewport: Viewport = {
   // The default palette's mid tone. Reading the chosen theme here would force
   // every page to render per-request and lose static generation, which is a bad
   // trade for the colour of the mobile browser chrome.
-  themeColor: "#382558",
+  themeColor: "#ece3f7",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

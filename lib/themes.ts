@@ -30,12 +30,14 @@ export type Theme = {
   swatch: { surface: string; accent: string };
 };
 
+// Ids are storage keys and must stay stable across redesigns; the display
+// names describe the current look and are free to change.
 export const THEMES: Theme[] = [
-  { id: "midnight", name: "Midnight", swatch: { surface: "#382558", accent: "#d9b13a" } },
-  { id: "forest", name: "Forest", swatch: { surface: "#224334", accent: "#ecb84f" } },
-  { id: "sapphire", name: "Sapphire", swatch: { surface: "#1b3765", accent: "#7cc9ec" } },
-  { id: "ember", name: "Ember", swatch: { surface: "#472619", accent: "#f79a60" } },
-  { id: "slate", name: "Slate", swatch: { surface: "#364351", accent: "#56d6ca" } },
+  { id: "midnight", name: "Lavender", swatch: { surface: "#ece3f7", accent: "#6b3fa0" } },
+  { id: "forest", name: "Meadow", swatch: { surface: "#e2efdf", accent: "#2f6b40" } },
+  { id: "sapphire", name: "Sky", swatch: { surface: "#ddebf8", accent: "#1d5c94" } },
+  { id: "ember", name: "Peach", swatch: { surface: "#f8e5d4", accent: "#a34a17" } },
+  { id: "slate", name: "Mist", swatch: { surface: "#e5eaef", accent: "#176a62" } },
   { id: "parchment", name: "Parchment", swatch: { surface: "#f3ead6", accent: "#8c2f39" } },
 ];
 
