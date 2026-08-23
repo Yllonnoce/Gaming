@@ -29,6 +29,13 @@ export type RulesTerm = {
 };
 
 export type Rules = {
+  /**
+   * Panel title, for things that aren't played. Defaults to "How to play
+   * <title>"; a tool might say "How Noisy Room works".
+   */
+  heading?: string;
+  /** Title of the closing notes; defaults to "What this scorekeeper assumes". */
+  appNotesHeading?: string;
   /** One sentence: how you win. */
   objective: string;
   players: string;
@@ -57,6 +64,7 @@ import { rules as pinochle } from "@/apps/pinochle/rules";
 import { rules as rummy } from "@/apps/rummy/rules";
 import { rules as golf } from "@/apps/golf/rules";
 import { rules as farkle } from "@/apps/farkle/rules";
+import { rules as noisyRoom } from "@/apps/noisy-room/rules";
 
 const RULES: Record<string, Rules> = {
   "five-crowns": fiveCrowns,
@@ -69,6 +77,7 @@ const RULES: Record<string, Rules> = {
   rummy,
   golf,
   farkle,
+  "noisy-room": noisyRoom,
 };
 
 export function getRules(slug: string): Rules | undefined {

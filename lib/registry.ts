@@ -44,6 +44,7 @@ import { manifest as pinochle } from "@/apps/pinochle/manifest";
 import { manifest as rummy } from "@/apps/rummy/manifest";
 import { manifest as golf } from "@/apps/golf/manifest";
 import { manifest as farkle } from "@/apps/farkle/manifest";
+import { manifest as noisyRoom } from "@/apps/noisy-room/manifest";
 
 export const APPS: AppManifest[] = [
   fiveCrowns,
@@ -56,6 +57,7 @@ export const APPS: AppManifest[] = [
   rummy,
   golf,
   farkle,
+  noisyRoom,
 ];
 
 export function getApp(slug: string): AppManifest | undefined {
@@ -82,4 +84,5 @@ export const APP_COMPONENTS: Record<string, () => Promise<{ default: ComponentTy
   rummy: () => import("@/apps/rummy/Rummy"),
   golf: () => import("@/apps/golf/Golf"),
   farkle: () => import("@/apps/farkle/Farkle"),
+  "noisy-room": () => import("@/apps/noisy-room/NoisyRoom"),
 };

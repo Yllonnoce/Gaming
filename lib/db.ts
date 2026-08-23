@@ -52,6 +52,27 @@ const SCHEMA = [
    )`,
   `CREATE INDEX IF NOT EXISTS idx_app_state_lookup
      ON app_state (user_id, app_slug, updated_at DESC)`,
+  /**
+   * Noisy Room. A room is shared by everyone who holds its link, so it cannot
+   * live in app_state (which is per user). The row records who started it;
+   * the name itself is the only credential, which is the same model as the
+   * VDO.Ninja room it maps onto.
+   */
+  `CREATE TABLE IF NOT EXISTS rooms (
+     name         TEXT PRIMARY KEY,
+     created_by   TEXT    NOT NULL,
+     created_at   INTEGER NOT NULL,
+     last_seen_at INTEGER NOT NULL
+   )`,
+  `CREATE TABLE IF NOT EXISTS side_rooms (
+     room       TEXT    NOT NULL,
+     id         TEXT    NOT NULL,
+     label      TEXT    NOT NULL,
+     created_by TEXT    NOT NULL,
+     created_at INTEGER NOT NULL,
+     PRIMARY KEY (room, id),
+     FOREIGN KEY (room) REFERENCES rooms(name) ON DELETE CASCADE
+   )`,
 ];
 
 /**

@@ -13,17 +13,34 @@ import type { SyncStatus } from "@/lib/useAppState";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "ghost";
+  /**
+   * Buttons fill their row by default, which is right for the one action at
+   * the bottom of a panel. A row of small actions wants "auto". This is a prop
+   * rather than a `w-auto` in className because both utilities set width and
+   * the stylesheet's order, not the class order, decides which wins.
+   */
+  width?: "full" | "auto";
 };
 
-export function Button({ variant = "primary", className = "", ...props }: ButtonProps) {
+export function Button({
+  variant = "primary",
+  width = "full",
+  className = "",
+  ...props
+}: ButtonProps) {
   const base =
-    "w-full rounded-lg font-display text-sm font-bold uppercase tracking-[0.12em] transition disabled:opacity-40";
+    "rounded-lg font-display text-sm font-bold uppercase tracking-[0.12em] transition disabled:opacity-40";
+  const widths = { full: "w-full", auto: "w-auto px-4" };
   const variants = {
     primary: "bg-accent py-3.5 text-on-accent hover:bg-accent-soft disabled:hover:bg-accent",
     ghost: "border border-accent/50 py-3 text-accent hover:bg-accent/10",
   };
   return (
-    <button type="button" className={`${base} ${variants[variant]} ${className}`} {...props} />
+    <button
+      type="button"
+      className={`${base} ${widths[width]} ${variants[variant]} ${className}`}
+      {...props}
+    />
   );
 }
 

@@ -21,7 +21,7 @@ export function RulesPanel({ rules, title }: { rules: Rules; title: string }) {
         >
           ▸
         </span>
-        How to play {title}
+        {rules.heading ?? `How to play ${title}`}
       </summary>
 
       <div className="border-t border-muted/15 px-4 pb-5 pt-4">
@@ -61,7 +61,9 @@ export function RulesPanel({ rules, title }: { rules: Rules; title: string }) {
 
         {rules.appNotes && rules.appNotes.length > 0 && (
           <section className="mt-5 border-t border-muted/15 pt-4">
-            <h3 className="label-caps mb-2">What this scorekeeper assumes</h3>
+            <h3 className="label-caps mb-2">
+              {rules.appNotesHeading ?? "What this scorekeeper assumes"}
+            </h3>
             <ul className="ml-4 list-disc space-y-1.5 text-[0.9375rem] text-muted marker:text-accent/60">
               {rules.appNotes.map((note, index) => (
                 <li key={index}>{note}</li>

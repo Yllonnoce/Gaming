@@ -50,7 +50,7 @@ export default async function AppPage({ params }: Props) {
               href="#rules"
               className="text-sm text-muted underline underline-offset-2 transition hover:text-accent"
             >
-              How to play
+              {rules.heading ? "How it works" : "How to play"}
             </a>
           )}
           <ThemePicker />

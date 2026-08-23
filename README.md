@@ -21,6 +21,9 @@ Apps so far:
 - **Rummy** — hands to 500.
 - **Golf** — nine or eighteen holes, lowest wins.
 - **Farkle** — banked points to 10,000.
+- **Noisy Room** — a tool, not a game: everyone at the table hears everyone
+  else through their own headphones. Scan a code to join; anyone can open a
+  side room for a private word.
 
 ## Running it
 
@@ -176,6 +179,37 @@ from the UI and tested directly:
 ```bash
 npm test
 ```
+
+## Noisy Room
+
+The audio is not ours. Noisy Room hands people to
+[VDO.Ninja's Comms app](https://docs.vdo.ninja/steves-helper-apps/comms), a
+free browser intercom that is already audio-only, phone-first, and built around
+a row of group buttons — which is exactly what a table wants. This site does the
+part Comms cannot: it mints a room name, serves the page the QR code points at,
+and keeps the list of side rooms so every phone's buttons match.
+
+- **Room names** are two words and a number (`brave-otter-42`) so they can be
+  read aloud to anyone who can't scan. Generation and validation live in
+  [`apps/noisy-room/names.ts`](apps/noisy-room/names.ts); the Comms link is
+  built in [`apps/noisy-room/links.ts`](apps/noisy-room/links.ts). Both are
+  pure and tested.
+- **The room page**, `/r/<room>`, renders for any well-formed name whether or
+  not the database knows it. The database is ephemeral in production, and a
+  code someone already scanned must survive a deploy; it just comes back with
+  no side rooms.
+- **Side rooms** are the one thing shared between visitors, so they have their
+  own tables ([`lib/rooms.ts`](lib/rooms.ts)) rather than living in the
+  per-user `app_state`. Anyone holding the link can add one; only its creator
+  or the room's creator can remove it. Mutations are Server Actions in
+  [`apps/noisy-room/actions.ts`](apps/noisy-room/actions.ts), and the page
+  polls every fifteen seconds so a side room added on one phone shows up on the
+  others.
+- **Groups in Comms** are passed as `&groups=Table,Kitchen,…` — the plural
+  form, which only defines the buttons. The singular `&group=` would be passed
+  through to the inner VDO.Ninja frame and silently join it.
+- `NEXT_PUBLIC_COMMS_URL` points at a different Comms host: a pinned version,
+  the `comms.cam` alias, or a self-hosted copy.
 
 ## Rules
 
