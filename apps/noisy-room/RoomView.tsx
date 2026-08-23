@@ -1,13 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState, useSyncExternalStore, useTransition } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Button, IconButton, TextInput } from "@/components/ui";
 import { QrCode } from "@/components/QrCode";
-import { CommsFrame } from "./CommsFrame";
+import { useAudioEngine, type EngineStatus } from "./engine";
 import type { SideRoom } from "@/lib/rooms";
 import { addSideRoomAction, removeSideRoomAction } from "./actions";
-import { commsUrl, roomPath } from "./links";
+import { commsUrl, engineUrl, roomPath } from "./links";
 import {
   DEFAULT_GROUPS,
   DEFAULT_MIC_GAIN,
@@ -43,7 +50,21 @@ const REFRESH_MS = 15_000;
 const REFRESH_IN_CALL_MS = 8_000;
 
 /** The call as it was started. Frozen: changing the URL would reload the frame. */
-type Session = { src: string; name: string; micGain: number };
+type Session = { src: string; fallback: string; name: string; micGain: number };
+
+/**
+ * What the engine frame may ask for, delegated from this page. Autoplay is
+ * the important one: the person's tap on Join is what lets remote audio play
+ * inside a frame they never touch.
+ */
+const ENGINE_ALLOW = "microphone; autoplay; screen-wake-lock";
+
+const STATUS_TEXT: Record<EngineStatus, string> = {
+  starting: "Waiting for the microphone…",
+  mic: "Microphone on · joining…",
+  connected: "Connected",
+  ended: "Call ended",
+};
 
 /**
  * The visitor's name and mic level live in localStorage so they follow them
@@ -101,7 +122,10 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
   const [copied, setCopied] = useState(false);
   const [bigCode, setBigCode] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
-  const [fullscreen, setFullscreen] = useState(false);
+  const [showEngine, setShowEngine] = useState(false);
+  const [hearTable, setHearTable] = useState(true);
+  const engineFrame = useRef<HTMLIFrameElement>(null);
+  const engine = useAudioEngine(session !== null, engineFrame);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -121,15 +145,15 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
     };
   }, [router, inCall]);
 
-  // The page behind a full-screen call should not scroll.
+  // "Keep hearing the table" is a listen-only membership of the table group
+  // while talking somewhere else; drop it when the table is the talk group.
+  const talkGroup = engine.groups[0] ?? TABLE_GROUP;
   useEffect(() => {
-    if (!fullscreen) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [fullscreen]);
+    if (!session || engine.status !== "connected") return;
+    engine.setListenGroups(hearTable && talkGroup !== TABLE_GROUP ? [TABLE_GROUP] : []);
+    // engine is a stable bag of callbacks; listing it would re-run on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, engine.status, hearTable, talkGroup]);
 
   const joinUrl = useMemo(
     () => commsUrl({ room, sideRooms: sideRooms.map((s) => s.id), label: name, micGain }),
@@ -187,17 +211,25 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
   };
 
   const join = () => {
-    setSession({ src: joinUrl, name: name.trim(), micGain });
-    setFullscreen(false);
+    engine.reset();
+    setSession({
+      src: engineUrl({ room, label: name, micGain }),
+      fallback: joinUrl,
+      name: name.trim(),
+      micGain,
+    });
+    setShowEngine(false);
   };
 
   const leave = () => {
-    if (!window.confirm("Leave the call?")) return;
+    if (engine.status !== "ended" && !window.confirm("Leave the call?")) return;
     setSession(null);
-    setFullscreen(false);
   };
 
   const sideRoomIds = useMemo(() => sideRooms.map((s) => s.id), [sideRooms]);
+  const allGroups = useMemo(() => [...DEFAULT_GROUPS, ...sideRoomIds], [sideRoomIds]);
+  const labelFor = (id: string) => sideRooms.find((s) => s.id === id)?.label ?? id;
+  const peersIn = (id: string) => engine.peers.filter((p) => p.groups.includes(id));
 
   const preview = toGroupId(draft);
   const isHost = viewerId !== null && viewerId === hostId;
@@ -249,85 +281,154 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
       </section>
 
       {/* Join --------------------------------------------------------- */}
-      <section
-        className={
-          fullscreen && session
-            ? "fixed inset-0 z-50 flex flex-col bg-[#2e445c]"
-            : "panel mb-3 p-4"
-        }
-      >
+      <section className="panel mb-3 p-4">
         {session ? (
           <>
-            <div
-              className={
-                fullscreen
-                  ? "flex items-center justify-between gap-3 px-3 py-2 text-white"
-                  : "mb-3 flex items-center justify-between gap-3"
-              }
-            >
+            <div className="mb-3 flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h2 className={fullscreen ? "font-display text-sm font-bold tracking-wide" : "label-caps"}>
-                  {fullscreen ? room : "In the call"}
-                </h2>
-                <p className={`truncate text-sm ${fullscreen ? "text-white/70" : "text-muted"}`}>
+                <h2 className="label-caps">In the call</h2>
+                <p className="truncate text-sm text-muted">
                   {session.name ? `As ${session.name} · ` : ""}mic {session.micGain}%
                 </p>
-              </div>
-              <div className="flex shrink-0 gap-2">
-                <Button
-                  variant="ghost"
-                  width="auto"
-                  className={`py-1.5 text-xs ${fullscreen ? "border-white/50 text-white hover:bg-white/10" : ""}`}
-                  onClick={() => setFullscreen((f) => !f)}
+                <p
+                  className={`mt-0.5 text-sm ${
+                    engine.status === "connected" ? "text-accent" : "text-muted"
+                  }`}
+                  role="status"
                 >
-                  {fullscreen ? "Exit full screen" : "Full screen"}
-                </Button>
-                <Button
-                  variant="ghost"
-                  width="auto"
-                  className={`py-1.5 text-xs ${fullscreen ? "border-white/50 text-white hover:bg-white/10" : ""}`}
-                  onClick={leave}
-                >
-                  Leave
-                </Button>
-              </div>
-            </div>
-            <CommsFrame
-              src={session.src}
-              groupIds={sideRoomIds}
-              fullscreen={fullscreen}
-              title={`Noisy Room audio for ${room}`}
-            />
-            {!fullscreen && (
-              <>
-                <ol className="mt-3 ml-4 list-decimal space-y-1 text-sm text-muted marker:text-accent/60">
-                  <li>Allow the microphone, then tap <strong className="text-ink">START</strong>.</li>
-                  <li>
-                    Tap <strong className="text-ink">{TABLE_GROUP}</strong> to talk and listen with
-                    everyone; <strong className="text-ink">Head</strong>,{" "}
-                    <strong className="text-ink">Center</strong>,{" "}
-                    <strong className="text-ink">Foot</strong> or a side room for just those people.
-                  </li>
-                  <li>Keep this page open and the phone awake, or the microphone stops.</li>
-                </ol>
-                <p className="mt-3 text-[0.8125rem] text-muted">
-                  Audio not starting?{" "}
-                  <a
-                    href={session.src}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => {
-                      setSession(null);
-                      setFullscreen(false);
-                    }}
-                    className="underline underline-offset-2 hover:text-accent"
-                  >
-                    Open it in its own tab
-                  </a>{" "}
-                  instead.
+                  {STATUS_TEXT[engine.status]}
+                  {engine.status === "connected" &&
+                    ` · ${engine.peers.length === 0 ? "nobody else yet" : `${engine.peers.length} other${engine.peers.length === 1 ? "" : "s"}`}`}
                 </p>
-              </>
+              </div>
+              <Button variant="ghost" width="auto" className="py-1.5 text-xs" onClick={leave}>
+                Leave
+              </Button>
+            </div>
+
+            {/* Talk to --------------------------------------------------- */}
+            <h3 className="mb-2 text-sm text-muted">Talking to</h3>
+            <div className="mb-3 grid grid-cols-2 gap-2">
+              {allGroups.map((id) => {
+                const active = talkGroup === id;
+                const here = peersIn(id).length;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-pressed={active}
+                    disabled={engine.status === "ended"}
+                    onClick={() => engine.setTalkGroups([id])}
+                    className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-3 text-left font-display text-[0.9375rem] transition disabled:opacity-40 ${
+                      active
+                        ? "border-accent bg-accent font-bold text-on-accent"
+                        : "border-muted/35 text-ink hover:border-accent/55 hover:text-accent"
+                    }`}
+                  >
+                    <span className="truncate">{labelFor(id)}</span>
+                    {here > 0 && (
+                      <span
+                        className={`shrink-0 rounded-full px-2 text-xs tabular-nums ${
+                          active ? "bg-on-accent/20" : "bg-accent/10 text-accent"
+                        }`}
+                        aria-label={`${here} here`}
+                      >
+                        {here}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <label className="mb-4 flex items-center gap-2 text-sm text-muted">
+              <input
+                type="checkbox"
+                checked={hearTable}
+                onChange={(event) => setHearTable(event.target.checked)}
+                className="h-4 w-4 accent-accent"
+              />
+              Keep hearing the {TABLE_GROUP} while in a side room
+            </label>
+
+            {/* Mic -------------------------------------------------------- */}
+            <Button
+              variant={engine.muted ? "ghost" : "primary"}
+              onClick={() => engine.setMic(engine.muted)}
+              disabled={engine.status === "starting" || engine.status === "ended"}
+              aria-pressed={engine.muted}
+            >
+              {engine.muted ? "Muted — tap to talk" : "Mute"}
+            </Button>
+
+            {/* Who's here ------------------------------------------------- */}
+            <h3 className="mt-4 mb-1 text-sm text-muted">Who&rsquo;s here</h3>
+            {engine.peers.length === 0 ? (
+              <p className="text-sm text-muted/80">
+                {engine.status === "connected"
+                  ? "Just you so far. Hold up the code."
+                  : "Nobody yet."}
+              </p>
+            ) : (
+              <ul className="divide-y divide-muted/15 text-[0.9375rem]">
+                {engine.peers.map((peer) => (
+                  <li
+                    key={peer.streamID}
+                    data-stream={peer.streamID}
+                    className="flex items-center gap-3 py-1.5"
+                  >
+                    <span className="min-w-0 flex-1 truncate">
+                      {peer.label || "Someone"}
+                      {peer.muted && <span className="ml-1 text-muted" title="Muted">🔇</span>}
+                    </span>
+                    <span className="shrink-0 text-[0.8125rem] text-muted">
+                      {peer.groups.length ? peer.groups.map(labelFor).join(", ") : "—"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             )}
+
+            {/* Engine ----------------------------------------------------- */}
+            <div className="mt-4 border-t border-muted/15 pt-3">
+              <button
+                type="button"
+                onClick={() => setShowEngine((v) => !v)}
+                aria-expanded={showEngine}
+                className="text-[0.8125rem] text-muted underline underline-offset-2 hover:text-accent"
+              >
+                {showEngine ? "Hide" : "Show"} the audio engine
+              </button>
+              <span className="ml-2 text-[0.8125rem] text-muted/80">
+                for volume per person, the settings gear, or if something needs a tap.
+              </span>
+              {/* Collapsed, not removed: the frame must stay alive and in the
+                  document for the call to keep running. */}
+              <div
+                className={showEngine ? "mt-2" : "h-0 overflow-hidden"}
+                aria-hidden={!showEngine}
+              >
+                <iframe
+                  ref={engineFrame}
+                  src={session.src}
+                  title={`Audio engine for ${room}`}
+                  allow={ENGINE_ALLOW}
+                  className="h-[28rem] w-full rounded-lg border-0 bg-black"
+                />
+              </div>
+              <p className="mt-2 text-[0.8125rem] text-muted">
+                Audio not starting?{" "}
+                <a
+                  href={session.fallback}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setSession(null)}
+                  className="underline underline-offset-2 hover:text-accent"
+                >
+                  Open the call in its own tab
+                </a>{" "}
+                instead.
+              </p>
+            </div>
           </>
         ) : (
           <>
@@ -374,15 +475,13 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
             </div>
             <p className="mb-4 text-[0.8125rem] text-muted">
               Everyone starts at {DEFAULT_MIC_GAIN}%: phones this close to mouths run hot. Turn up
-              if people say you&rsquo;re quiet; change it any time in the audio panel&rsquo;s
-              settings gear.
+              if people say you&rsquo;re quiet.
             </p>
             <Button id="noisy-room-join" onClick={join}>
               Put on headphones &amp; join
             </Button>
             <p className="mt-3 text-center text-sm text-muted">
-              The audio panel opens right here. Allow the microphone, tap{" "}
-              <strong className="text-ink">START</strong>, then tap{" "}
+              Allow the microphone when asked. You start at the{" "}
               <strong className="text-ink">{TABLE_GROUP}</strong>.
             </p>
           </>
@@ -467,9 +566,7 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
           )
         ) : (
           <p className="text-sm text-muted">
-            Side rooms can&rsquo;t be saved right now. You can still make one on the spot: in the
-            audio panel, tap <strong className="text-ink">+</strong>, type a name, and tell the
-            others to do the same.
+            Side rooms can&rsquo;t be saved right now; the built-in ones still work.
           </p>
         )}
         {preview && draft.trim() && preview !== draft.trim() && (
@@ -480,8 +577,7 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
         {error && <p className="mt-2 text-sm text-accent">{error}</p>}
 
         <p className="mt-3 text-[0.8125rem] text-muted/80">
-          New side rooms become buttons for everyone in the call within a few seconds, including
-          people who joined before it was added.
+          New side rooms become buttons for everyone in the call within a few seconds.
         </p>
       </section>
 

@@ -10,7 +10,14 @@ import {
   TABLE_GROUP,
   DEFAULT_GROUPS,
 } from "../apps/noisy-room/names.ts";
-import { commsUrl, roomPath, DEFAULT_COMMS_URL } from "../apps/noisy-room/links.ts";
+import {
+  commsUrl,
+  engineUrl,
+  roomPath,
+  DEFAULT_COMMS_URL,
+  DEFAULT_VDO_NINJA_URL,
+  ENGINE_FLAGS,
+} from "../apps/noisy-room/links.ts";
 import { clampMicGain, DEFAULT_MIC_GAIN } from "../apps/noisy-room/names.ts";
 
 // ---- room names --------------------------------------------------------
@@ -121,4 +128,29 @@ test("mic gain is clamped and stepped, and never falls to a mute", () => {
   assert.equal(clampMicGain(123), 120);
   assert.equal(clampMicGain(Number.NaN), DEFAULT_MIC_GAIN);
   assert.equal(clampMicGain(DEFAULT_MIC_GAIN), DEFAULT_MIC_GAIN);
+});
+
+// ---- the embedded engine ---------------------------------------------------
+
+test("the engine link is audio-only, auto-starting, and strict about groups", () => {
+  const url = new URL(engineUrl({ room: "brave-otter-42", label: "Eric", micGain: 70 }));
+  assert.equal(url.origin + "/", DEFAULT_VDO_NINJA_URL);
+  assert.equal(url.searchParams.get("room"), "brave-otter-42");
+  assert.equal(url.searchParams.get("vd"), "0", "no video device");
+  assert.equal(url.searchParams.get("ad"), "1", "an audio device");
+  assert.equal(url.searchParams.get("group"), TABLE_GROUP, "starts at the table");
+  assert.equal(url.searchParams.get("label"), "Eric");
+  assert.equal(url.searchParams.get("audiogain"), "70");
+  for (const flag of ENGINE_FLAGS) {
+    assert.ok(url.searchParams.has(flag), flag);
+    assert.match(url.search, new RegExp(`[?&]${flag}(&|$)`), `${flag} is a bare flag`);
+  }
+  // Comms-only options must not leak in: the page draws its own buttons.
+  assert.equal(url.searchParams.has("groups"), false);
+});
+
+test("the engine link falls back to the default mic level and no label", () => {
+  const url = new URL(engineUrl({ room: "brave-otter-42" }));
+  assert.equal(url.searchParams.get("audiogain"), String(DEFAULT_MIC_GAIN));
+  assert.equal(url.searchParams.has("label"), false);
 });

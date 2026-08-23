@@ -13,7 +13,7 @@ export const rules: Rules = {
     { term: "Table", meaning: "the group everyone starts in. Tap it and you talk and listen with the whole room." },
     { term: "Head, Center, Foot", meaning: "built-in groups for each end and the middle of a long table, so one end can talk without shouting past the other." },
     { term: "Side room", meaning: "any extra group inside the room, for partners or a quick private word. Anyone can make one." },
-    { term: "START", meaning: "the button in the audio panel that switches your microphone on. Nothing is heard until you tap it." },
+    { term: "Mute", meaning: "the big button under the group buttons. Tap it when you're not talking in a loud room; tap again to talk." },
   ],
   sections: [
     {
@@ -41,14 +41,14 @@ export const rules: Rules = {
           kind: "steps",
           items: [
             "Put headphones on first. Without them your phone's speaker feeds back into its microphone and everyone hears an echo.",
-            "Type your name if you like, set your mic level, then tap Put on headphones & join. The audio panel appears right on this page; tap Full screen if it's cramped.",
-            "Allow the microphone when asked, then tap START.",
-            "Tap Table. You're in.",
+            "Type your name if you like, set your mic level, then tap Put on headphones & join.",
+            "Allow the microphone when asked. That's it — you're at the Table.",
+            "The buttons that appear are who you're talking to; the list below them is who's here and where they are.",
           ],
         },
         {
           kind: "text",
-          text: "Keep this page open and the phone awake. Phones stop the microphone when the screen locks or the browser goes into the background. If the audio won't start in the panel, the link under it opens the same thing in its own tab.",
+          text: "Keep this page open and the phone awake. Phones stop the microphone when the screen locks or the browser goes into the background. The audio engine itself is tucked away under the controls; Show the audio engine reveals it for per-person volume, the settings gear, or if your browser wants a tap before it will play sound. If it still won't start, the link there opens the call in its own tab.",
         },
       ],
     },
@@ -62,9 +62,9 @@ export const rules: Rules = {
         {
           kind: "list",
           items: [
-            "Anyone can add one from the room page. Within a few seconds it's a button for everyone in the call, including people who joined earlier.",
-            "Tap a side room's button to move into it. Tap Table to come back.",
-            "The eye icon on a button lets you listen to a group without your microphone going into it.",
+            "Anyone can add one from the room page. Within a few seconds it's a button for everyone in the call.",
+            "Tap a side room's button to move into it. Tap Table to come back. The number on a button is how many people are in it.",
+            "Keep hearing the Table while in a side room is on by default: you talk only to your side room but still hear the main conversation. Untick it for a properly private huddle.",
           ],
         },
       ],
@@ -78,8 +78,8 @@ export const rules: Rules = {
             "Headphones for everyone, not just the person who needs them. One open speaker makes echo for all.",
             "You'll hear a voice live across the table and again a fraction of a second later in your ears. That's normal; it fades into the background quickly.",
             "Mute yourself when you aren't talking if the room is very loud. The audio page has a mute button.",
-            "Everyone's microphone starts at half level, because a phone a hand's width from your mouth is loud. If people say you're quiet, turn the Mic level slider up before joining, or use the settings gear in the audio panel once you're in.",
-            "Each person in the audio panel has a small volume bar, so you can turn one voice up or down just for yourself.",
+            "Everyone's microphone starts at half level, because a phone a hand's width from your mouth is loud. If people say you're quiet, turn the Mic level slider up before joining, or use the settings gear in the audio engine once you're in.",
+            "Show the audio engine to get a small volume bar per person, so you can turn one voice up or down just for yourself.",
             "Everyone on the same Wi-Fi helps. It works over mobile data too, but uses more of it.",
           ],
         },
@@ -101,8 +101,8 @@ export const rules: Rules = {
     },
   ],
   appNotes: [
-    "The audio itself is handled by VDO.Ninja's Comms app, a free browser intercom. This site mints the room, hands out the code, and keeps the list of side rooms; it never touches the sound.",
-    "Side rooms are remembered on the server so every phone sees the same list. If that storage is unavailable you can still make groups on the spot with the + button in the audio panel.",
+    "The audio itself is handled by VDO.Ninja, a free browser tool, running quietly inside this page. This site mints the room, hands out the code, draws the controls, and keeps the list of side rooms; it never touches the sound.",
+    "Side rooms are remembered on the server so every phone sees the same list. If that storage is unavailable, the built-in Table, Head, Center and Foot still work.",
     "Room names are lowercase words joined by hyphens. Comms shows them with underscores instead — same room, different spelling.",
   ],
 };

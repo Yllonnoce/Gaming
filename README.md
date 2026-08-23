@@ -205,14 +205,21 @@ and keeps the list of side rooms so every phone's buttons match.
   [`apps/noisy-room/actions.ts`](apps/noisy-room/actions.ts), and the page
   polls (every 15 s, 8 s during a call) so a side room added on one phone
   shows up on the others.
-- **The call is embedded.** Tapping *Join* freezes the Comms URL and renders
-  it in a same-origin iframe ([`CommsFrame`](apps/noisy-room/CommsFrame.tsx))
-  in place of the join form, with full-screen and leave controls and an
-  "open in its own tab" fallback. Because the frame is ours, the page calls
-  Comms' global `drawGroup(id)` whenever the side-room list changes, so a
-  side room added on one phone becomes a button on every phone already in
-  the call — no reconnect. The `src` is never changed while mounted; that
-  would reload the frame and drop the call.
+- **The controls are ours; the engine is VDO.Ninja's.** Tapping *Join*
+  freezes an engine URL (`engineUrl` in `links.ts`: audio-only, auto-start,
+  strict group mode) and mounts VDO.Ninja in a frame that stays collapsed
+  under the controls. [`engine.ts`](apps/noisy-room/engine.ts) drives it
+  through VDO.Ninja's postMessage iframe API — `{groups}`, `{groupView}`,
+  `{mic}`, `{getDetailedState}` in; `joined-room-complete`, `mic-mute-state`,
+  `group-set-updated`, `hungup` and `detailedState` out — and the room page
+  draws group buttons (with head-counts), mute, and "who's here" from that
+  state. New side rooms are just new buttons, so they reach everyone on the
+  next poll. The frame's `src` is never changed while mounted; that would
+  reload it and drop the call. The frame is collapsed with `height: 0`, not
+  `display: none`, so browsers keep treating it as live; *Show the audio
+  engine* reveals it for per-person volume, the settings gear, and any
+  browser prompt that needs a tap. *Open the call in its own tab* is the
+  fallback, and still uses our patched Comms copy.
 - **Groups in Comms** are passed as `&groups=Table,Head,Center,Foot,…` — the
   four built-ins (`DEFAULT_GROUPS` in `names.ts`) then the side rooms. The plural
   form, which only defines the buttons. The singular `&group=` would be passed

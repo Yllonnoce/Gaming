@@ -63,3 +63,60 @@ export function commsUrl({ room, sideRooms = [], label, micGain, base }: CommsLi
 export function roomPath(room: string): string {
   return `/r/${encodeURIComponent(room)}`;
 }
+
+/**
+ * The VDO.Ninja engine link, for the embedded call.
+ *
+ * This bypasses Comms entirely: the room page draws its own group buttons,
+ * mute and "who's here", and drives VDO.Ninja through its postMessage API
+ * (see engine.ts). The frame itself stays collapsed unless someone needs it.
+ */
+
+export const DEFAULT_VDO_NINJA_URL = "https://vdo.ninja/";
+
+/**
+ * Flags that make VDO.Ninja behave as a silent audio engine. Mirrors what
+ * Comms passes to its own inner frame, minus its cosmetics.
+ *
+ *   webcam + vd=0 + ad=1   skip the "camera or screen?" choice, audio only
+ *   autostart              publish as soon as the microphone is granted
+ *   groupmode              strict groups: hear only the groups you're in
+ *   novice                 simplified in-frame UI, for when the frame is shown
+ *   hideheader, nvb        no VDO.Ninja header or video-bitrate chrome
+ *   volumecontrol          per-person volume bars when the frame is shown
+ *   mediasettings          the settings gear (gain, auto-gain) when shown
+ */
+export const ENGINE_FLAGS = [
+  "webcam",
+  "autostart",
+  "groupmode",
+  "novice",
+  "hideheader",
+  "nvb",
+  "volumecontrol",
+  "mediasettings",
+] as const;
+
+export type EngineLink = {
+  room: string;
+  label?: string;
+  micGain?: number;
+  base?: string;
+};
+
+export function engineUrl({ room, label, micGain, base }: EngineLink): string {
+  const url = new URL(base ?? process.env.NEXT_PUBLIC_VDO_NINJA_URL ?? DEFAULT_VDO_NINJA_URL);
+  const params = new URLSearchParams();
+  params.set("room", room);
+  // Start in the table group, so strict group mode never leaves a newcomer
+  // hearing nothing before the page has sent its first command.
+  params.set("group", DEFAULT_GROUPS[0]);
+  params.set("vd", "0");
+  params.set("ad", "1");
+  for (const flag of ENGINE_FLAGS) params.set(flag, "");
+  const name = label?.trim();
+  if (name) params.set("label", name);
+  params.set("audiogain", String(clampMicGain(micGain ?? DEFAULT_MIC_GAIN)));
+  url.search = params.toString().replace(/=(?=&|$)/g, "");
+  return url.toString();
+}
