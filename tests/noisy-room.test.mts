@@ -92,7 +92,7 @@ test("the Comms link carries the room, the built-in groups first, and the name",
   const url = parse(href);
   assert.equal(url.pathname, DEFAULT_COMMS_URL);
   assert.equal(url.searchParams.get("room"), "brave-otter-42");
-  assert.equal(url.searchParams.get("groups"), "Table,Head,Center,Foot,Kitchen,PartnersA");
+  assert.equal(url.searchParams.get("groups"), "Table,Kitchen,PartnersA");
   assert.equal(url.searchParams.get("label"), "Eric S");
   // The singular form would make the inner frame auto-join a group.
   assert.equal(url.searchParams.get("group"), null);

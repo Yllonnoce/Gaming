@@ -220,8 +220,9 @@ and keeps the list of side rooms so every phone's buttons match.
   engine* reveals it for per-person volume, the settings gear, and any
   browser prompt that needs a tap. *Open the call in its own tab* is the
   fallback, and still uses our patched Comms copy.
-- **Groups in Comms** are passed as `&groups=Table,Head,Center,Foot,…` — the
-  four built-ins (`DEFAULT_GROUPS` in `names.ts`) then the side rooms. The plural
+- **Groups in Comms** are passed as `&groups=Table,…` — the built-ins
+  (`DEFAULT_GROUPS` in `names.ts`, currently just the table) then the side
+  rooms. The plural
   form, which only defines the buttons. The singular `&group=` would be passed
   through to the inner VDO.Ninja frame and silently join it.
 - **Audio knobs.** Every join link carries `&mediasettings` so each person gets

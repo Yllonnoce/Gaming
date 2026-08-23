@@ -58,10 +58,10 @@ export function isRoomName(value: string): boolean {
 export const TABLE_GROUP = "Table";
 
 /**
- * Every room's built-in groups, in button order: the whole table, then one
- * for each end and the middle of a long one. Side rooms are added after these.
+ * Every room's built-in groups, in button order. Just the table; side rooms
+ * are added after it. Kept as a list so more built-ins are a one-line change.
  */
-export const DEFAULT_GROUPS = [TABLE_GROUP, "Head", "Center", "Foot"] as const;
+export const DEFAULT_GROUPS = [TABLE_GROUP] as const;
 
 export const MAX_SIDE_ROOMS = 12;
 export const MAX_GROUP_ID_LENGTH = 20;

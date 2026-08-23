@@ -11,7 +11,6 @@ export const rules: Rules = {
   terms: [
     { term: "Room", meaning: "one table's audio space, named like brave-otter-42. The code and link both point at it." },
     { term: "Table", meaning: "the group everyone starts in. Tap it and you talk and listen with the whole room." },
-    { term: "Head, Center, Foot", meaning: "built-in groups for each end and the middle of a long table, so one end can talk without shouting past the other." },
     { term: "Side room", meaning: "any extra group inside the room, for partners or a quick private word. Anyone can make one." },
     { term: "Mute", meaning: "the big button under the group buttons. Tap it when you're not talking in a loud room; tap again to talk." },
   ],
@@ -57,7 +56,7 @@ export const rules: Rules = {
       blocks: [
         {
           kind: "text",
-          text: "A side room is a private channel inside the room. Every room starts with Head, Center and Foot for the ends and middle of a long table; add your own for partners planning a hand or two people stepping into the kitchen.",
+          text: "A side room is a private channel inside the room: partners planning a hand, two people stepping into the kitchen, or one end of a long table talking without shouting past the other.",
         },
         {
           kind: "list",
@@ -103,7 +102,7 @@ export const rules: Rules = {
   ],
   appNotes: [
     "The audio itself is handled by VDO.Ninja, a free browser tool, running quietly inside this page. This site mints the room, hands out the code, draws the controls, and keeps the list of side rooms; it never touches the sound.",
-    "Side rooms are remembered on the server so every phone sees the same list. If that storage is unavailable, the built-in Table, Head, Center and Foot still work.",
+    "Side rooms are remembered on the server so every phone sees the same list. If that storage is unavailable, the Table still works; side rooms just can't be added until it's back.",
     "Room names are lowercase words joined by hyphens. Comms shows them with underscores instead — same room, different spelling.",
   ],
 };
