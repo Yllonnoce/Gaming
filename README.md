@@ -205,9 +205,15 @@ and keeps the list of side rooms so every phone's buttons match.
   [`apps/noisy-room/actions.ts`](apps/noisy-room/actions.ts), and the page
   polls every fifteen seconds so a side room added on one phone shows up on the
   others.
-- **Groups in Comms** are passed as `&groups=Table,Kitchen,…` — the plural
+- **Groups in Comms** are passed as `&groups=Table,Head,Center,Foot,…` — the
+  four built-ins (`DEFAULT_GROUPS` in `names.ts`) then the side rooms. The plural
   form, which only defines the buttons. The singular `&group=` would be passed
   through to the inner VDO.Ninja frame and silently join it.
+- **Audio knobs.** Every join link carries `&mediasettings` so each person gets
+  VDO.Ninja's own settings gear (mic gain, auto-gain, noise suppression) rather
+  than only a director. The room page's *Mic level* slider sets the starting
+  `&audiogain`, remembered per phone and clamped to 50–200% so it can never
+  reach the `0` that mutes a guest until a director unmutes them.
 - `NEXT_PUBLIC_COMMS_URL` points at a different Comms host: a pinned version,
   the `comms.cam` alias, or a self-hosted copy.
 

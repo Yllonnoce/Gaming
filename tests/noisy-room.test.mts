@@ -8,8 +8,10 @@ import {
   isGroupId,
   toGroupId,
   TABLE_GROUP,
+  DEFAULT_GROUPS,
 } from "../apps/noisy-room/names.ts";
 import { commsUrl, roomPath, DEFAULT_COMMS_URL } from "../apps/noisy-room/links.ts";
+import { clampMicGain, DEFAULT_MIC_GAIN } from "../apps/noisy-room/names.ts";
 
 // ---- room names --------------------------------------------------------
 
@@ -51,23 +53,27 @@ test("labels become alphanumeric group ids", () => {
   assert.equal(toGroupId("???"), "");
 });
 
-test("group ids may not collide with the table group", () => {
+test("group ids may not collide with the built-in groups", () => {
   assert.ok(isGroupId("Kitchen"));
   assert.ok(!isGroupId(toGroupId("table")));
-  assert.ok(!isGroupId(TABLE_GROUP));
+  for (const group of DEFAULT_GROUPS) {
+    assert.ok(!isGroupId(group), group);
+    assert.ok(!isGroupId(group.toUpperCase()), group);
+  }
+  assert.equal(DEFAULT_GROUPS[0], TABLE_GROUP, "Table is the first button");
   assert.ok(!isGroupId(""));
   assert.ok(!isGroupId("no spaces"));
 });
 
 // ---- links -------------------------------------------------------------
 
-test("the Comms link carries the room, the table group first, and the name", () => {
+test("the Comms link carries the room, the built-in groups first, and the name", () => {
   const url = new URL(
     commsUrl({ room: "brave-otter-42", sideRooms: ["Kitchen", "PartnersA"], label: "Eric S" }),
   );
   assert.equal(`${url.origin}${url.pathname}`, DEFAULT_COMMS_URL);
   assert.equal(url.searchParams.get("room"), "brave-otter-42");
-  assert.equal(url.searchParams.get("groups"), `${TABLE_GROUP},Kitchen,PartnersA`);
+  assert.equal(url.searchParams.get("groups"), "Table,Head,Center,Foot,Kitchen,PartnersA");
   assert.equal(url.searchParams.get("label"), "Eric S");
   // The singular form would make the inner frame auto-join a group.
   assert.equal(url.searchParams.get("group"), null);
@@ -76,7 +82,7 @@ test("the Comms link carries the room, the table group first, and the name", () 
 test("a blank name leaves the label off so Comms does not prompt for one", () => {
   const url = new URL(commsUrl({ room: "brave-otter-42", label: "   " }));
   assert.equal(url.searchParams.has("label"), false);
-  assert.equal(url.searchParams.get("groups"), TABLE_GROUP);
+  assert.equal(url.searchParams.get("groups"), DEFAULT_GROUPS.join(","));
 });
 
 test("the Comms host can be swapped without touching the parameters", () => {
@@ -87,4 +93,28 @@ test("the Comms host can be swapped without touching the parameters", () => {
 
 test("room pages live under /r/", () => {
   assert.equal(roomPath("brave-otter-42"), "/r/brave-otter-42");
+});
+
+// ---- microphone gain -----------------------------------------------------
+
+test("every join link lets the person into their own audio settings", () => {
+  const url = new URL(commsUrl({ room: "brave-otter-42" }));
+  assert.ok(url.searchParams.has("mediasettings"));
+  // Written as a bare flag, the way VDO.Ninja documents it.
+  assert.match(url.search, /[?&]mediasettings(&|$)/);
+});
+
+test("the starting mic gain is only sent when it differs from the default", () => {
+  const normal = new URL(commsUrl({ room: "brave-otter-42", micGain: DEFAULT_MIC_GAIN }));
+  assert.equal(normal.searchParams.has("audiogain"), false);
+  const quiet = new URL(commsUrl({ room: "brave-otter-42", micGain: 150 }));
+  assert.equal(quiet.searchParams.get("audiogain"), "150");
+});
+
+test("mic gain is clamped and stepped, and never falls to a mute", () => {
+  assert.equal(clampMicGain(0), 50, "0 would mute the guest until a director unmutes them");
+  assert.equal(clampMicGain(999), 200);
+  assert.equal(clampMicGain(123), 120);
+  assert.equal(clampMicGain(Number.NaN), DEFAULT_MIC_GAIN);
+  assert.equal(clampMicGain(DEFAULT_MIC_GAIN), DEFAULT_MIC_GAIN);
 });

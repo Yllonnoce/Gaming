@@ -11,7 +11,8 @@ export const rules: Rules = {
   terms: [
     { term: "Room", meaning: "one table's audio space, named like brave-otter-42. The code and link both point at it." },
     { term: "Table", meaning: "the group everyone starts in. Tap it and you talk and listen with the whole room." },
-    { term: "Side room", meaning: "a smaller group inside the room, for partners or a quick private word. Anyone can make one." },
+    { term: "Head, Center, Foot", meaning: "built-in groups for each end and the middle of a long table, so one end can talk without shouting past the other." },
+    { term: "Side room", meaning: "any extra group inside the room, for partners or a quick private word. Anyone can make one." },
     { term: "START", meaning: "the button on the audio page that switches your microphone on. Nothing is heard until you tap it." },
   ],
   sections: [
@@ -56,7 +57,7 @@ export const rules: Rules = {
       blocks: [
         {
           kind: "text",
-          text: "A side room is a private channel inside the room. Partners can plan a hand, or two people can step into the kitchen without leaving the table.",
+          text: "A side room is a private channel inside the room. Every room starts with Head, Center and Foot for the ends and middle of a long table; add your own for partners planning a hand or two people stepping into the kitchen.",
         },
         {
           kind: "list",
@@ -78,6 +79,8 @@ export const rules: Rules = {
             "Headphones for everyone, not just the person who needs them. One open speaker makes echo for all.",
             "You'll hear a voice live across the table and again a fraction of a second later in your ears. That's normal; it fades into the background quickly.",
             "Mute yourself when you aren't talking if the room is very loud. The audio page has a mute button.",
+            "Too quiet or too loud? Your level is auto-adjusted by default. The settings gear on the audio page has a mic gain slider and an auto-gain switch; the Mic level slider on the room page sets where you start.",
+            "Each person in the audio page has a small volume bar, so you can turn one voice up or down just for yourself.",
             "Everyone on the same Wi-Fi helps. It works over mobile data too, but uses more of it.",
           ],
         },

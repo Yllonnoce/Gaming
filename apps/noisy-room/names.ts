@@ -54,8 +54,14 @@ export function isRoomName(value: string): boolean {
   );
 }
 
-/** The group everyone starts in. Side rooms are the other groups. */
+/** The group everyone starts in. */
 export const TABLE_GROUP = "Table";
+
+/**
+ * Every room's built-in groups, in button order: the whole table, then one
+ * for each end and the middle of a long one. Side rooms are added after these.
+ */
+export const DEFAULT_GROUPS = [TABLE_GROUP, "Head", "Center", "Foot"] as const;
 
 export const MAX_SIDE_ROOMS = 12;
 export const MAX_GROUP_ID_LENGTH = 20;
@@ -81,6 +87,22 @@ export function isGroupId(value: string): boolean {
     value.length > 0 &&
     value.length <= MAX_GROUP_ID_LENGTH &&
     /^[A-Za-z0-9]+$/.test(value) &&
-    value.toLowerCase() !== TABLE_GROUP.toLowerCase()
+    !DEFAULT_GROUPS.some((group) => group.toLowerCase() === value.toLowerCase())
   );
+}
+
+/**
+ * Microphone gain, in percent. VDO.Ninja's default is 100 with auto-gain on
+ * top, so most people never need to move this; the range is for a phone that
+ * is always too quiet or a voice that always clips.
+ */
+export const DEFAULT_MIC_GAIN = 100;
+export const MIN_MIC_GAIN = 50;
+export const MAX_MIC_GAIN = 200;
+export const MIC_GAIN_STEP = 10;
+
+export function clampMicGain(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_MIC_GAIN;
+  const stepped = Math.round(value / MIC_GAIN_STEP) * MIC_GAIN_STEP;
+  return Math.min(MAX_MIC_GAIN, Math.max(MIN_MIC_GAIN, stepped));
 }

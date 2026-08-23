@@ -7,7 +7,18 @@ import { QrCode } from "@/components/QrCode";
 import type { SideRoom } from "@/lib/rooms";
 import { addSideRoomAction, removeSideRoomAction } from "./actions";
 import { commsUrl, roomPath } from "./links";
-import { MAX_LABEL_LENGTH, MAX_SIDE_ROOMS, TABLE_GROUP, toGroupId } from "./names";
+import {
+  DEFAULT_GROUPS,
+  DEFAULT_MIC_GAIN,
+  MAX_LABEL_LENGTH,
+  MAX_MIC_GAIN,
+  MAX_SIDE_ROOMS,
+  MIC_GAIN_STEP,
+  MIN_MIC_GAIN,
+  TABLE_GROUP,
+  clampMicGain,
+  toGroupId,
+} from "./names";
 
 /**
  * The shared room page: the code to scan, the button that joins, and the list
@@ -25,45 +36,54 @@ type Props = {
 };
 
 const NAME_KEY = "gh:noisy-room:name";
+const MIC_GAIN_KEY = "gh:noisy-room:micgain";
 const REFRESH_MS = 15_000;
 
 /**
- * The visitor's name lives in localStorage so it follows them from room to
- * room. Exposed as an external store rather than copied into state in an
- * effect: React reads the server snapshot ("") while hydrating and the real
+ * The visitor's name and mic level live in localStorage so they follow them
+ * from room to room. Exposed as external stores rather than copied into state
+ * in an effect: React reads the server snapshot while hydrating and the real
  * value immediately after, with no extra render pass of our own.
  */
-const nameListeners = new Set<() => void>();
-
-function readName(): string {
-  try {
-    return window.localStorage.getItem(NAME_KEY) ?? "";
-  } catch {
-    return "";
-  }
-}
-
-function writeName(value: string) {
-  try {
-    window.localStorage.setItem(NAME_KEY, value);
-  } catch {
-    // Private mode; the field still works for this page load via the listeners.
-  }
-  for (const listener of nameListeners) listener();
-}
-
-function subscribeName(listener: () => void) {
-  nameListeners.add(listener);
-  return () => {
-    nameListeners.delete(listener);
+function localStore(key: string, fallback: string) {
+  const listeners = new Set<() => void>();
+  return {
+    read(): string {
+      try {
+        return window.localStorage.getItem(key) ?? fallback;
+      } catch {
+        return fallback;
+      }
+    },
+    write(value: string) {
+      try {
+        window.localStorage.setItem(key, value);
+      } catch {
+        // Private mode; the value still holds for this page load via the listeners.
+      }
+      for (const listener of listeners) listener();
+    },
+    subscribe(listener: () => void) {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+    server: () => fallback,
   };
 }
+
+const nameStore = localStore(NAME_KEY, "");
+const micGainStore = localStore(MIC_GAIN_KEY, String(DEFAULT_MIC_GAIN));
 
 const subscribeNothing = () => () => {};
 
 export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props) {
   const router = useRouter();
-  const name = useSyncExternalStore(subscribeName, readName, () => "");
+  const name = useSyncExternalStore(nameStore.subscribe, nameStore.read, nameStore.server);
+  const micGain = clampMicGain(
+    Number(useSyncExternalStore(micGainStore.subscribe, micGainStore.read, micGainStore.server)),
+  );
   // The origin is only known in the browser; null on the server and during
   // hydration, which is what the placeholder states below key off.
   const origin = useSyncExternalStore(
@@ -93,11 +113,12 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
   }, [router]);
 
   const joinUrl = useMemo(
-    () => commsUrl({ room, sideRooms: sideRooms.map((s) => s.id), label: name }),
-    [room, sideRooms, name],
+    () => commsUrl({ room, sideRooms: sideRooms.map((s) => s.id), label: name, micGain }),
+    [room, sideRooms, name, micGain],
   );
 
-  const rememberName = (value: string) => writeName(value);
+  const rememberName = (value: string) => nameStore.write(value);
+  const rememberMicGain = (value: number) => micGainStore.write(String(clampMicGain(value)));
 
   const copyLink = async () => {
     if (!pageUrl) return;
@@ -211,6 +232,39 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
             onChange={(event) => rememberName(event.target.value)}
           />
         </div>
+        <div className="mb-1 flex items-baseline justify-between gap-3">
+          <label className="text-sm text-muted" htmlFor="noisy-room-gain">
+            Mic level
+          </label>
+          <span className="font-display text-sm tabular-nums text-accent">
+            {micGain === DEFAULT_MIC_GAIN ? "Normal" : `${micGain}%`}
+          </span>
+        </div>
+        <div className="mb-1 flex items-center gap-2">
+          <input
+            id="noisy-room-gain"
+            type="range"
+            min={MIN_MIC_GAIN}
+            max={MAX_MIC_GAIN}
+            step={MIC_GAIN_STEP}
+            value={micGain}
+            onChange={(event) => rememberMicGain(Number(event.target.value))}
+            className="min-w-0 flex-1 accent-accent"
+          />
+          <Button
+            variant="ghost"
+            width="auto"
+            className="py-1.5 text-xs"
+            onClick={() => rememberMicGain(DEFAULT_MIC_GAIN)}
+            disabled={micGain === DEFAULT_MIC_GAIN}
+          >
+            Reset
+          </Button>
+        </div>
+        <p className="mb-4 text-[0.8125rem] text-muted">
+          Where you start; change it any time in the audio page&rsquo;s settings gear. Leave it on
+          Normal unless your phone is always too quiet or too loud.
+        </p>
         <a
           href={joinUrl}
           target="_blank"
@@ -224,7 +278,12 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
           <li>
             Tap <strong className="text-ink">{TABLE_GROUP}</strong> to talk and listen with everyone.
           </li>
-          <li>Tap a side room instead to talk just with the people in it.</li>
+          <li>
+            Tap <strong className="text-ink">Head</strong>,{" "}
+            <strong className="text-ink">Center</strong> or{" "}
+            <strong className="text-ink">Foot</strong> to talk just with your end of the table, or a
+            side room to talk with the people in it.
+          </li>
         </ol>
       </section>
 
@@ -232,12 +291,18 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
       <section className="panel mb-3 p-4">
         <h2 className="label-caps mb-1">Side rooms</h2>
         <p className="mb-3 text-sm text-muted">
-          Private huddles inside the room. Each one becomes a button next to{" "}
-          <strong className="text-ink">{TABLE_GROUP}</strong> for anyone who joins from this page.
+          Private huddles inside the room. Every room has{" "}
+          {DEFAULT_GROUPS.map((group, index) => (
+            <span key={group}>
+              {index > 0 && (index === DEFAULT_GROUPS.length - 1 ? " and " : ", ")}
+              <strong className="text-ink">{group}</strong>
+            </span>
+          ))}{" "}
+          built in; anything added here becomes another button for anyone who joins from this page.
         </p>
 
         {sideRooms.length === 0 ? (
-          <p className="mb-3 text-sm text-muted/80">None yet.</p>
+          <p className="mb-3 text-sm text-muted/80">No extra side rooms yet.</p>
         ) : (
           <ul className="mb-3 divide-y divide-muted/15">
             {sideRooms.map((side) => {
