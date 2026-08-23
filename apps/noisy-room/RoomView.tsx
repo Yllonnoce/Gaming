@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore, useTransition } fro
 import { useRouter } from "next/navigation";
 import { Button, IconButton, TextInput } from "@/components/ui";
 import { QrCode } from "@/components/QrCode";
+import { CommsFrame } from "./CommsFrame";
 import type { SideRoom } from "@/lib/rooms";
 import { addSideRoomAction, removeSideRoomAction } from "./actions";
 import { commsUrl, roomPath } from "./links";
@@ -38,6 +39,11 @@ type Props = {
 const NAME_KEY = "gh:noisy-room:name";
 const MIC_GAIN_KEY = "gh:noisy-room:micgain";
 const REFRESH_MS = 15_000;
+/** Faster while in a call, since a new side room should show up promptly. */
+const REFRESH_IN_CALL_MS = 8_000;
+
+/** The call as it was started. Frozen: changing the URL would reload the frame. */
+type Session = { src: string; name: string; micGain: number };
 
 /**
  * The visitor's name and mic level live in localStorage so they follow them
@@ -94,23 +100,36 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
   const pageUrl = origin ? `${origin}${roomPath(room)}` : null;
   const [copied, setCopied] = useState(false);
   const [bigCode, setBigCode] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [fullscreen, setFullscreen] = useState(false);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   // Side rooms added from another phone show up without a manual reload.
   // Polling is plenty at this scale and needs no connection to keep alive.
+  const inCall = session !== null;
   useEffect(() => {
     const tick = () => {
       if (document.visibilityState === "visible") router.refresh();
     };
-    const timer = window.setInterval(tick, REFRESH_MS);
+    const timer = window.setInterval(tick, inCall ? REFRESH_IN_CALL_MS : REFRESH_MS);
     document.addEventListener("visibilitychange", tick);
     return () => {
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", tick);
     };
-  }, [router]);
+  }, [router, inCall]);
+
+  // The page behind a full-screen call should not scroll.
+  useEffect(() => {
+    if (!fullscreen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [fullscreen]);
 
   const joinUrl = useMemo(
     () => commsUrl({ room, sideRooms: sideRooms.map((s) => s.id), label: name, micGain }),
@@ -167,6 +186,19 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
     });
   };
 
+  const join = () => {
+    setSession({ src: joinUrl, name: name.trim(), micGain });
+    setFullscreen(false);
+  };
+
+  const leave = () => {
+    if (!window.confirm("Leave the call?")) return;
+    setSession(null);
+    setFullscreen(false);
+  };
+
+  const sideRoomIds = useMemo(() => sideRooms.map((s) => s.id), [sideRooms]);
+
   const preview = toGroupId(draft);
   const isHost = viewerId !== null && viewerId === hostId;
 
@@ -217,72 +249,144 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
       </section>
 
       {/* Join --------------------------------------------------------- */}
-      <section className="panel mb-3 p-4">
-        <h2 className="label-caps mb-3">Join</h2>
-        <label className="mb-1 block text-sm text-muted" htmlFor="noisy-room-name">
-          Your name (shown to the others)
-        </label>
-        <div className="mb-3 flex gap-2">
-          <TextInput
-            id="noisy-room-name"
-            value={name}
-            maxLength={MAX_LABEL_LENGTH}
-            placeholder="Optional"
-            autoComplete="nickname"
-            onChange={(event) => rememberName(event.target.value)}
-          />
-        </div>
-        <div className="mb-1 flex items-baseline justify-between gap-3">
-          <label className="text-sm text-muted" htmlFor="noisy-room-gain">
-            Mic level
-          </label>
-          <span className="font-display text-sm tabular-nums text-accent">{micGain}%</span>
-        </div>
-        <div className="mb-1 flex items-center gap-2">
-          <input
-            id="noisy-room-gain"
-            type="range"
-            min={MIN_MIC_GAIN}
-            max={MAX_MIC_GAIN}
-            step={MIC_GAIN_STEP}
-            value={micGain}
-            onChange={(event) => rememberMicGain(Number(event.target.value))}
-            className="min-w-0 flex-1 accent-accent"
-          />
-          <Button
-            variant="ghost"
-            width="auto"
-            className="py-1.5 text-xs"
-            onClick={() => rememberMicGain(DEFAULT_MIC_GAIN)}
-            disabled={micGain === DEFAULT_MIC_GAIN}
-          >
-            Reset
-          </Button>
-        </div>
-        <p className="mb-4 text-[0.8125rem] text-muted">
-          Everyone starts at {DEFAULT_MIC_GAIN}%: phones this close to mouths run hot. Turn up if
-          people say you&rsquo;re quiet; change it any time in the audio page&rsquo;s settings gear.
-        </p>
-        <a
-          href={joinUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block w-full rounded-lg bg-accent py-3.5 text-center font-display text-sm font-bold uppercase tracking-[0.12em] text-on-accent transition hover:bg-accent-soft"
-        >
-          Put on headphones &amp; join
-        </a>
-        <ol className="mt-3 ml-4 list-decimal space-y-1 text-sm text-muted marker:text-accent/60">
-          <li>Allow the microphone, then tap <strong className="text-ink">START</strong>.</li>
-          <li>
-            Tap <strong className="text-ink">{TABLE_GROUP}</strong> to talk and listen with everyone.
-          </li>
-          <li>
-            Tap <strong className="text-ink">Head</strong>,{" "}
-            <strong className="text-ink">Center</strong> or{" "}
-            <strong className="text-ink">Foot</strong> to talk just with your end of the table, or a
-            side room to talk with the people in it.
-          </li>
-        </ol>
+      <section
+        className={
+          fullscreen && session
+            ? "fixed inset-0 z-50 flex flex-col bg-[#2e445c]"
+            : "panel mb-3 p-4"
+        }
+      >
+        {session ? (
+          <>
+            <div
+              className={
+                fullscreen
+                  ? "flex items-center justify-between gap-3 px-3 py-2 text-white"
+                  : "mb-3 flex items-center justify-between gap-3"
+              }
+            >
+              <div className="min-w-0">
+                <h2 className={fullscreen ? "font-display text-sm font-bold tracking-wide" : "label-caps"}>
+                  {fullscreen ? room : "In the call"}
+                </h2>
+                <p className={`truncate text-sm ${fullscreen ? "text-white/70" : "text-muted"}`}>
+                  {session.name ? `As ${session.name} · ` : ""}mic {session.micGain}%
+                </p>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Button
+                  variant="ghost"
+                  width="auto"
+                  className={`py-1.5 text-xs ${fullscreen ? "border-white/50 text-white hover:bg-white/10" : ""}`}
+                  onClick={() => setFullscreen((f) => !f)}
+                >
+                  {fullscreen ? "Exit full screen" : "Full screen"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  width="auto"
+                  className={`py-1.5 text-xs ${fullscreen ? "border-white/50 text-white hover:bg-white/10" : ""}`}
+                  onClick={leave}
+                >
+                  Leave
+                </Button>
+              </div>
+            </div>
+            <CommsFrame
+              src={session.src}
+              groupIds={sideRoomIds}
+              fullscreen={fullscreen}
+              title={`Noisy Room audio for ${room}`}
+            />
+            {!fullscreen && (
+              <>
+                <ol className="mt-3 ml-4 list-decimal space-y-1 text-sm text-muted marker:text-accent/60">
+                  <li>Allow the microphone, then tap <strong className="text-ink">START</strong>.</li>
+                  <li>
+                    Tap <strong className="text-ink">{TABLE_GROUP}</strong> to talk and listen with
+                    everyone; <strong className="text-ink">Head</strong>,{" "}
+                    <strong className="text-ink">Center</strong>,{" "}
+                    <strong className="text-ink">Foot</strong> or a side room for just those people.
+                  </li>
+                  <li>Keep this page open and the phone awake, or the microphone stops.</li>
+                </ol>
+                <p className="mt-3 text-[0.8125rem] text-muted">
+                  Audio not starting?{" "}
+                  <a
+                    href={session.src}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      setSession(null);
+                      setFullscreen(false);
+                    }}
+                    className="underline underline-offset-2 hover:text-accent"
+                  >
+                    Open it in its own tab
+                  </a>{" "}
+                  instead.
+                </p>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <h2 className="label-caps mb-3">Join</h2>
+            <label className="mb-1 block text-sm text-muted" htmlFor="noisy-room-name">
+              Your name (shown to the others)
+            </label>
+            <div className="mb-3 flex gap-2">
+              <TextInput
+                id="noisy-room-name"
+                value={name}
+                maxLength={MAX_LABEL_LENGTH}
+                placeholder="Optional"
+                autoComplete="nickname"
+                onChange={(event) => rememberName(event.target.value)}
+              />
+            </div>
+            <div className="mb-1 flex items-baseline justify-between gap-3">
+              <label className="text-sm text-muted" htmlFor="noisy-room-gain">
+                Mic level
+              </label>
+              <span className="font-display text-sm tabular-nums text-accent">{micGain}%</span>
+            </div>
+            <div className="mb-1 flex items-center gap-2">
+              <input
+                id="noisy-room-gain"
+                type="range"
+                min={MIN_MIC_GAIN}
+                max={MAX_MIC_GAIN}
+                step={MIC_GAIN_STEP}
+                value={micGain}
+                onChange={(event) => rememberMicGain(Number(event.target.value))}
+                className="min-w-0 flex-1 accent-accent"
+              />
+              <Button
+                variant="ghost"
+                width="auto"
+                className="py-1.5 text-xs"
+                onClick={() => rememberMicGain(DEFAULT_MIC_GAIN)}
+                disabled={micGain === DEFAULT_MIC_GAIN}
+              >
+                Reset
+              </Button>
+            </div>
+            <p className="mb-4 text-[0.8125rem] text-muted">
+              Everyone starts at {DEFAULT_MIC_GAIN}%: phones this close to mouths run hot. Turn up
+              if people say you&rsquo;re quiet; change it any time in the audio panel&rsquo;s
+              settings gear.
+            </p>
+            <Button id="noisy-room-join" onClick={join}>
+              Put on headphones &amp; join
+            </Button>
+            <p className="mt-3 text-center text-sm text-muted">
+              The audio panel opens right here. Allow the microphone, tap{" "}
+              <strong className="text-ink">START</strong>, then tap{" "}
+              <strong className="text-ink">{TABLE_GROUP}</strong>.
+            </p>
+          </>
+        )}
       </section>
 
       {/* Side rooms --------------------------------------------------- */}
@@ -364,8 +468,8 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
         ) : (
           <p className="text-sm text-muted">
             Side rooms can&rsquo;t be saved right now. You can still make one on the spot: in the
-            audio page, tap <strong className="text-ink">+</strong>, type a name, and tell the others
-            to do the same.
+            audio panel, tap <strong className="text-ink">+</strong>, type a name, and tell the
+            others to do the same.
           </p>
         )}
         {preview && draft.trim() && preview !== draft.trim() && (
@@ -376,9 +480,8 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
         {error && <p className="mt-2 text-sm text-accent">{error}</p>}
 
         <p className="mt-3 text-[0.8125rem] text-muted/80">
-          Already in the audio page when a side room is added? Tap{" "}
-          <strong className="text-ink">+</strong> there and type its button name, or come back here
-          and join again.
+          New side rooms become buttons for everyone in the call within a few seconds, including
+          people who joined before it was added.
         </p>
       </section>
 

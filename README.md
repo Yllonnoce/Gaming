@@ -203,8 +203,16 @@ and keeps the list of side rooms so every phone's buttons match.
   per-user `app_state`. Anyone holding the link can add one; only its creator
   or the room's creator can remove it. Mutations are Server Actions in
   [`apps/noisy-room/actions.ts`](apps/noisy-room/actions.ts), and the page
-  polls every fifteen seconds so a side room added on one phone shows up on the
-  others.
+  polls (every 15 s, 8 s during a call) so a side room added on one phone
+  shows up on the others.
+- **The call is embedded.** Tapping *Join* freezes the Comms URL and renders
+  it in a same-origin iframe ([`CommsFrame`](apps/noisy-room/CommsFrame.tsx))
+  in place of the join form, with full-screen and leave controls and an
+  "open in its own tab" fallback. Because the frame is ours, the page calls
+  Comms' global `drawGroup(id)` whenever the side-room list changes, so a
+  side room added on one phone becomes a button on every phone already in
+  the call — no reconnect. The `src` is never changed while mounted; that
+  would reload the frame and drop the call.
 - **Groups in Comms** are passed as `&groups=Table,Head,Center,Foot,…` — the
   four built-ins (`DEFAULT_GROUPS` in `names.ts`) then the side rooms. The plural
   form, which only defines the buttons. The singular `&group=` would be passed
