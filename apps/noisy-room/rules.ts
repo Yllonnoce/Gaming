@@ -79,7 +79,7 @@ export const rules: Rules = {
             "Headphones for everyone, not just the person who needs them. One open speaker makes echo for all.",
             "You'll hear a voice live across the table and again a fraction of a second later in your ears. That's normal; it fades into the background quickly.",
             "Mute yourself when you aren't talking if the room is very loud. The audio page has a mute button.",
-            "Too quiet or too loud? Your level is auto-adjusted by default. The settings gear on the audio page has a mic gain slider and an auto-gain switch; the Mic level slider on the room page sets where you start.",
+            "Everyone's microphone starts at half level, because a phone a hand's width from your mouth is loud. If people say you're quiet, turn the Mic level slider up before joining, or use the settings gear on the audio page once you're in.",
             "Each person in the audio page has a small volume bar, so you can turn one voice up or down just for yourself.",
             "Everyone on the same Wi-Fi helps. It works over mobile data too, but uses more of it.",
           ],

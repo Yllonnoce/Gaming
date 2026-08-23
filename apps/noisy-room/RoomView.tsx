@@ -236,9 +236,7 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
           <label className="text-sm text-muted" htmlFor="noisy-room-gain">
             Mic level
           </label>
-          <span className="font-display text-sm tabular-nums text-accent">
-            {micGain === DEFAULT_MIC_GAIN ? "Normal" : `${micGain}%`}
-          </span>
+          <span className="font-display text-sm tabular-nums text-accent">{micGain}%</span>
         </div>
         <div className="mb-1 flex items-center gap-2">
           <input
@@ -262,8 +260,8 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
           </Button>
         </div>
         <p className="mb-4 text-[0.8125rem] text-muted">
-          Where you start; change it any time in the audio page&rsquo;s settings gear. Leave it on
-          Normal unless your phone is always too quiet or too loud.
+          Everyone starts at {DEFAULT_MIC_GAIN}%: phones this close to mouths run hot. Turn up if
+          people say you&rsquo;re quiet; change it any time in the audio page&rsquo;s settings gear.
         </p>
         <a
           href={joinUrl}

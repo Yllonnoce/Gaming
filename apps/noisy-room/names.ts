@@ -92,12 +92,13 @@ export function isGroupId(value: string): boolean {
 }
 
 /**
- * Microphone gain, in percent. VDO.Ninja's default is 100 with auto-gain on
- * top, so most people never need to move this; the range is for a phone that
- * is always too quiet or a voice that always clips.
+ * Microphone gain, in percent. VDO.Ninja's own default is 100, but with every
+ * phone inches from every mouth that runs hot, so everyone starts at half and
+ * turns up if they're told they're quiet. The floor stays above 0, which
+ * VDO.Ninja treats as "muted until a director unmutes you".
  */
-export const DEFAULT_MIC_GAIN = 100;
-export const MIN_MIC_GAIN = 50;
+export const DEFAULT_MIC_GAIN = 50;
+export const MIN_MIC_GAIN = 10;
 export const MAX_MIC_GAIN = 200;
 export const MIC_GAIN_STEP = 10;
 

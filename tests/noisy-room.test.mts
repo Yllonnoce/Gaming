@@ -67,11 +67,14 @@ test("group ids may not collide with the built-in groups", () => {
 
 // ---- links -------------------------------------------------------------
 
+/** The default link is site-relative; parse it against a stand-in origin. */
+const parse = (href: string) => new URL(href, "https://example.test");
+
 test("the Comms link carries the room, the built-in groups first, and the name", () => {
-  const url = new URL(
-    commsUrl({ room: "brave-otter-42", sideRooms: ["Kitchen", "PartnersA"], label: "Eric S" }),
-  );
-  assert.equal(`${url.origin}${url.pathname}`, DEFAULT_COMMS_URL);
+  const href = commsUrl({ room: "brave-otter-42", sideRooms: ["Kitchen", "PartnersA"], label: "Eric S" });
+  assert.ok(href.startsWith(`${DEFAULT_COMMS_URL}?`), "served from this site by default");
+  const url = parse(href);
+  assert.equal(url.pathname, DEFAULT_COMMS_URL);
   assert.equal(url.searchParams.get("room"), "brave-otter-42");
   assert.equal(url.searchParams.get("groups"), "Table,Head,Center,Foot,Kitchen,PartnersA");
   assert.equal(url.searchParams.get("label"), "Eric S");
@@ -80,7 +83,7 @@ test("the Comms link carries the room, the built-in groups first, and the name",
 });
 
 test("a blank name leaves the label off so Comms does not prompt for one", () => {
-  const url = new URL(commsUrl({ room: "brave-otter-42", label: "   " }));
+  const url = parse(commsUrl({ room: "brave-otter-42", label: "   " }));
   assert.equal(url.searchParams.has("label"), false);
   assert.equal(url.searchParams.get("groups"), DEFAULT_GROUPS.join(","));
 });
@@ -98,21 +101,22 @@ test("room pages live under /r/", () => {
 // ---- microphone gain -----------------------------------------------------
 
 test("every join link lets the person into their own audio settings", () => {
-  const url = new URL(commsUrl({ room: "brave-otter-42" }));
+  const url = parse(commsUrl({ room: "brave-otter-42" }));
   assert.ok(url.searchParams.has("mediasettings"));
   // Written as a bare flag, the way VDO.Ninja documents it.
   assert.match(url.search, /[?&]mediasettings(&|$)/);
 });
 
-test("the starting mic gain is only sent when it differs from the default", () => {
-  const normal = new URL(commsUrl({ room: "brave-otter-42", micGain: DEFAULT_MIC_GAIN }));
-  assert.equal(normal.searchParams.has("audiogain"), false);
-  const quiet = new URL(commsUrl({ room: "brave-otter-42", micGain: 150 }));
-  assert.equal(quiet.searchParams.get("audiogain"), "150");
+test("everyone starts at half mic level unless they chose otherwise", () => {
+  assert.equal(DEFAULT_MIC_GAIN, 50);
+  const plain = parse(commsUrl({ room: "brave-otter-42" }));
+  assert.equal(plain.searchParams.get("audiogain"), "50");
+  const loud = parse(commsUrl({ room: "brave-otter-42", micGain: 150 }));
+  assert.equal(loud.searchParams.get("audiogain"), "150");
 });
 
 test("mic gain is clamped and stepped, and never falls to a mute", () => {
-  assert.equal(clampMicGain(0), 50, "0 would mute the guest until a director unmutes them");
+  assert.equal(clampMicGain(0), 10, "0 would mute the guest until a director unmutes them");
   assert.equal(clampMicGain(999), 200);
   assert.equal(clampMicGain(123), 120);
   assert.equal(clampMicGain(Number.NaN), DEFAULT_MIC_GAIN);
