@@ -50,7 +50,7 @@ const REFRESH_MS = 15_000;
 const REFRESH_IN_CALL_MS = 8_000;
 
 /** The call as it was started. Frozen: changing the URL would reload the frame. */
-type Session = { src: string; fallback: string; name: string; micGain: number };
+type Session = { src: string; fallback: string; name: string };
 
 /**
  * What the engine frame may ask for, delegated from this page. Autoplay is
@@ -162,6 +162,11 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
 
   const rememberName = (value: string) => nameStore.write(value);
   const rememberMicGain = (value: number) => micGainStore.write(String(clampMicGain(value)));
+  /** During a call: remember it and apply it live. */
+  const adjustMicGain = (value: number) => {
+    rememberMicGain(value);
+    engine.setMicGain(value);
+  };
 
   const copyLink = async () => {
     if (!pageUrl) return;
@@ -216,7 +221,6 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
       src: engineUrl({ room, label: name, micGain }),
       fallback: joinUrl,
       name: name.trim(),
-      micGain,
     });
     setShowEngine(false);
   };
@@ -288,7 +292,7 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
               <div className="min-w-0">
                 <h2 className="label-caps">In the call</h2>
                 <p className="truncate text-sm text-muted">
-                  {session.name ? `As ${session.name} · ` : ""}mic {session.micGain}%
+                  {session.name ? `As ${session.name} · ` : ""}mic {micGain}%
                 </p>
                 <p
                   className={`mt-0.5 text-sm ${
@@ -359,6 +363,47 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
             >
               {engine.muted ? "Muted — tap to talk" : "Mute"}
             </Button>
+            <div className="mt-4">
+              <MicLevel
+                value={micGain}
+                onChange={adjustMicGain}
+                disabled={engine.status === "starting" || engine.status === "ended"}
+              />
+              <p className="text-[0.8125rem] text-muted">
+                Changes take effect straight away, and are remembered for next time.
+              </p>
+            </div>
+
+            {/* Devices ---------------------------------------------------- */}
+            {engine.devices.mics.length > 0 && (
+              <DevicePicker
+                id="noisy-room-mic"
+                label="Microphone"
+                devices={engine.devices.mics}
+                value={engine.currentMic}
+                onChange={engine.setMicDevice}
+                onOpen={engine.refreshDevices}
+                disabled={engine.status === "ended"}
+              />
+            )}
+            {engine.devices.speakers.length > 0 && (
+              <DevicePicker
+                id="noisy-room-speaker"
+                label="Speaker"
+                devices={engine.devices.speakers}
+                value={engine.currentSpeaker}
+                onChange={engine.setSpeakerDevice}
+                onOpen={engine.refreshDevices}
+                disabled={engine.status === "ended"}
+              />
+            )}
+            {engine.devices.mics.length > 0 && (
+              <p className="mt-1 text-[0.8125rem] text-muted">
+                Earbuds that connect after you joined show up when you open the menu.
+                {engine.devices.speakers.length === 0 &&
+                  " Your phone picks the speaker itself; plug in or pair and it follows."}
+              </p>
+            )}
 
             {/* Who's here ------------------------------------------------- */}
             <h3 className="mt-4 mb-1 text-sm text-muted">Who&rsquo;s here</h3>
@@ -446,36 +491,10 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
                 onChange={(event) => rememberName(event.target.value)}
               />
             </div>
-            <div className="mb-1 flex items-baseline justify-between gap-3">
-              <label className="text-sm text-muted" htmlFor="noisy-room-gain">
-                Mic level
-              </label>
-              <span className="font-display text-sm tabular-nums text-accent">{micGain}%</span>
-            </div>
-            <div className="mb-1 flex items-center gap-2">
-              <input
-                id="noisy-room-gain"
-                type="range"
-                min={MIN_MIC_GAIN}
-                max={MAX_MIC_GAIN}
-                step={MIC_GAIN_STEP}
-                value={micGain}
-                onChange={(event) => rememberMicGain(Number(event.target.value))}
-                className="min-w-0 flex-1 accent-accent"
-              />
-              <Button
-                variant="ghost"
-                width="auto"
-                className="py-1.5 text-xs"
-                onClick={() => rememberMicGain(DEFAULT_MIC_GAIN)}
-                disabled={micGain === DEFAULT_MIC_GAIN}
-              >
-                Reset
-              </Button>
-            </div>
+            <MicLevel value={micGain} onChange={rememberMicGain} />
             <p className="mb-4 text-[0.8125rem] text-muted">
-              Everyone starts at {DEFAULT_MIC_GAIN}%: phones this close to mouths run hot. Turn up
-              if people say you&rsquo;re quiet.
+              Everyone starts at {DEFAULT_MIC_GAIN}%: phones this close to mouths run hot. You can
+              change it during the call too.
             </p>
             <Button id="noisy-room-join" onClick={join}>
               Put on headphones &amp; join
@@ -594,6 +613,101 @@ export function RoomView({ room, sideRooms, viewerId, hostId, storageOk }: Props
           <span className="text-sm text-black/60">Tap anywhere to close</span>
         </button>
       )}
+    </div>
+  );
+}
+
+/** The microphone gain slider, used before joining and during the call. */
+function MicLevel({
+  value,
+  onChange,
+  disabled = false,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <>
+      <div className="mb-1 flex items-baseline justify-between gap-3">
+        <label className="text-sm text-muted" htmlFor="noisy-room-gain">
+          Mic level
+        </label>
+        <span className="font-display text-sm tabular-nums text-accent">{value}%</span>
+      </div>
+      <div className="mb-1 flex items-center gap-2">
+        <input
+          id="noisy-room-gain"
+          type="range"
+          min={MIN_MIC_GAIN}
+          max={MAX_MIC_GAIN}
+          step={MIC_GAIN_STEP}
+          value={value}
+          disabled={disabled}
+          onChange={(event) => onChange(Number(event.target.value))}
+          className="min-w-0 flex-1 accent-accent disabled:opacity-40"
+        />
+        <Button
+          variant="ghost"
+          width="auto"
+          className="py-1.5 text-xs"
+          onClick={() => onChange(DEFAULT_MIC_GAIN)}
+          disabled={disabled || value === DEFAULT_MIC_GAIN}
+        >
+          Reset
+        </Button>
+      </div>
+    </>
+  );
+}
+
+/**
+ * A device menu. The engine reports which device is live; if that id isn't in
+ * the list yet (menus lag a moment behind a switch) the menu shows it as
+ * "current" rather than jumping to the wrong entry.
+ */
+function DevicePicker({
+  id,
+  label,
+  devices,
+  value,
+  onChange,
+  onOpen,
+  disabled = false,
+}: {
+  id: string;
+  label: string;
+  devices: { deviceId: string; label: string }[];
+  value: string | null;
+  onChange: (deviceId: string) => void;
+  onOpen: () => void;
+  disabled?: boolean;
+}) {
+  // Before anyone has chosen, the browser is on its default device; show
+  // that rather than an empty "Choose…" when the list names one.
+  const effective = value ?? devices.find((d) => d.deviceId === "default")?.deviceId ?? null;
+  const known = effective !== null && devices.some((d) => d.deviceId === effective);
+  return (
+    <div className="mt-3">
+      <label className="mb-1 block text-sm text-muted" htmlFor={id}>
+        {label}
+      </label>
+      <select
+        id={id}
+        value={known ? effective : ""}
+        disabled={disabled}
+        onChange={(event) => event.target.value && onChange(event.target.value)}
+        onFocus={onOpen}
+        onPointerDown={onOpen}
+        className="w-full rounded-lg border border-muted/35 bg-well/60 px-3 py-2.5 text-base text-ink outline-none focus:border-accent disabled:opacity-40"
+      >
+        {!known && <option value="">{effective ? "Current device" : "Choose…"}</option>}
+        {devices.map((device) => (
+          <option key={device.deviceId} value={device.deviceId}>
+            {device.label}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

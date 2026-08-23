@@ -2,6 +2,16 @@
 
 import { useCallback, useEffect, useState, type RefObject } from "react";
 import { TABLE_GROUP } from "./names";
+import {
+  CURRENT_DEVICES_COMMAND,
+  CURRENT_DEVICES_KEY,
+  DEVICE_LIST_COMMAND,
+  micDeviceCommand,
+  micGainCommand,
+  parseDeviceList,
+  speakerDeviceCommand,
+  type DeviceLists,
+} from "./commands";
 
 /**
  * Driving VDO.Ninja as an audio engine.
@@ -11,9 +21,9 @@ import { TABLE_GROUP } from "./names";
  * state reported here, and every tap becomes a postMessage to the frame.
  *
  * The protocol is VDO.Ninja's iframe API. Commands in: {groups}, {groupView},
- * {mic}, {getDetailedState}. Events out arrive as {action, value} or as a
- * {detailedState} reply. Names were taken from VDO.Ninja's source rather than
- * its (partial) documentation.
+ * {mic}, {getDetailedState}, and an eval for mic gain (see commands.ts).
+ * Events out arrive as {action, value} or as a {detailedState} reply. Names
+ * were taken from VDO.Ninja's source rather than its (partial) documentation.
  */
 
 export type EngineStatus =
@@ -72,6 +82,9 @@ export function useAudioEngine(active: boolean, frame: RefObject<HTMLIFrameEleme
   const [muted, setMuted] = useState(false);
   const [groups, setGroups] = useState<string[]>([TABLE_GROUP]);
   const [peers, setPeers] = useState<Peer[]>([]);
+  const [devices, setDevices] = useState<DeviceLists>({ mics: [], speakers: [] });
+  const [currentMic, setCurrentMic] = useState<string | null>(null);
+  const [currentSpeaker, setCurrentSpeaker] = useState<string | null>(null);
 
   const post = useCallback(
     (message: Record<string, unknown>) => {
@@ -86,7 +99,16 @@ export function useAudioEngine(active: boolean, frame: RefObject<HTMLIFrameEleme
     setMuted(false);
     setGroups([TABLE_GROUP]);
     setPeers([]);
+    setDevices({ mics: [], speakers: [] });
+    setCurrentMic(null);
+    setCurrentSpeaker(null);
   }, []);
+
+  /** Re-read the device menus and which ones are live. Cheap; call freely. */
+  const refreshDevices = useCallback(() => {
+    post(DEVICE_LIST_COMMAND);
+    post(CURRENT_DEVICES_COMMAND);
+  }, [post]);
 
   useEffect(() => {
     if (!active) return;
@@ -95,18 +117,37 @@ export function useAudioEngine(active: boolean, frame: RefObject<HTMLIFrameEleme
       if (!source || event.source !== source) return;
       const data: unknown = event.data;
       if (!data || typeof data !== "object") return;
-      const message = data as { action?: unknown; value?: unknown; detailedState?: unknown };
+      const message = data as {
+        action?: unknown;
+        value?: unknown;
+        detailedState?: unknown;
+        deviceList?: unknown;
+        [CURRENT_DEVICES_KEY]?: unknown;
+      };
 
       if ("detailedState" in message) {
         setPeers(toPeers(message.detailedState));
         return;
       }
+      if ("deviceList" in message) {
+        setDevices(parseDeviceList(message.deviceList));
+        return;
+      }
+      if (CURRENT_DEVICES_KEY in message) {
+        const current = message[CURRENT_DEVICES_KEY] as { mic?: unknown; speaker?: unknown } | null;
+        setCurrentMic(typeof current?.mic === "string" ? current.mic : null);
+        setCurrentSpeaker(typeof current?.speaker === "string" ? current.speaker : null);
+        return;
+      }
       switch (message.action) {
         case "local-microphone-event":
           setStatus((s) => (s === "starting" ? "mic" : s));
+          // Labels only become readable once a microphone has been granted.
+          refreshDevices();
           break;
         case "joined-room-complete":
           setStatus("connected");
+          refreshDevices();
           break;
         case "mic-mute-state":
           setMuted(message.value === true);
@@ -123,7 +164,7 @@ export function useAudioEngine(active: boolean, frame: RefObject<HTMLIFrameEleme
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [active, frame]);
+  }, [active, frame, refreshDevices]);
 
   // Who's here, refreshed regularly. Cheap: the reply is a small object.
   useEffect(() => {
@@ -150,5 +191,48 @@ export function useAudioEngine(active: boolean, frame: RefObject<HTMLIFrameEleme
     [post],
   );
 
-  return { status, muted, groups, peers, reset, setTalkGroups, setListenGroups, setMic };
+  /** Live microphone gain, in percent; the join URL set the starting value. */
+  const setMicGain = useCallback((percent: number) => post(micGainCommand(percent)), [post]);
+
+  // Device switches are optimistic, then confirmed by re-reading the live
+  // track once the engine has had a moment to swap it.
+  const setMicDevice = useCallback(
+    (deviceId: string) => {
+      const command = micDeviceCommand(deviceId);
+      if (!command) return;
+      setCurrentMic(deviceId);
+      post(command);
+      window.setTimeout(() => post(CURRENT_DEVICES_COMMAND), 1500);
+    },
+    [post],
+  );
+
+  const setSpeakerDevice = useCallback(
+    (deviceId: string) => {
+      const command = speakerDeviceCommand(deviceId);
+      if (!command) return;
+      setCurrentSpeaker(deviceId);
+      post(command);
+      window.setTimeout(() => post(CURRENT_DEVICES_COMMAND), 1500);
+    },
+    [post],
+  );
+
+  return {
+    status,
+    muted,
+    groups,
+    peers,
+    devices,
+    currentMic,
+    currentSpeaker,
+    reset,
+    refreshDevices,
+    setTalkGroups,
+    setListenGroups,
+    setMic,
+    setMicGain,
+    setMicDevice,
+    setSpeakerDevice,
+  };
 }

@@ -19,6 +19,15 @@ import {
   ENGINE_FLAGS,
 } from "../apps/noisy-room/links.ts";
 import { clampMicGain, DEFAULT_MIC_GAIN } from "../apps/noisy-room/names.ts";
+import {
+  micGainCommand,
+  MIC_GAIN_FUNCTION,
+  micDeviceCommand,
+  speakerDeviceCommand,
+  parseDeviceList,
+  CURRENT_DEVICES_COMMAND,
+  CURRENT_DEVICES_KEY,
+} from "../apps/noisy-room/commands.ts";
 
 // ---- room names --------------------------------------------------------
 
@@ -153,4 +162,60 @@ test("the engine link falls back to the default mic level and no label", () => {
   const url = new URL(engineUrl({ room: "brave-otter-42" }));
   assert.equal(url.searchParams.get("audiogain"), String(DEFAULT_MIC_GAIN));
   assert.equal(url.searchParams.has("label"), false);
+});
+
+test("live mic gain is applied through VDO.Ninja's own changeMainGain", () => {
+  // Pinned on purpose: this is a function name from VDO.Ninja's source, not a
+  // documented command. If it changes upstream, this is where to look.
+  assert.equal(MIC_GAIN_FUNCTION, "changeMainGain");
+  assert.deepEqual(micGainCommand(80), { function: "eval", value: "changeMainGain(80)" });
+  assert.deepEqual(micGainCommand(999), { function: "eval", value: "changeMainGain(200)" });
+  assert.deepEqual(micGainCommand(0), { function: "eval", value: "changeMainGain(10)" });
+});
+
+// ---- audio devices ----------------------------------------------------------
+
+test("device switches go through VDO.Ninja by id, never by list position", () => {
+  assert.deepEqual(micDeviceCommand("a1b2c3=="), {
+    function: "eval",
+    value: 'changeAudioDeviceById("a1b2c3==")',
+  });
+  assert.deepEqual(micDeviceCommand("default"), {
+    function: "eval",
+    value: 'changeAudioDeviceById("default")',
+  });
+  assert.deepEqual(speakerDeviceCommand("communications"), {
+    changeAudioOutputDevice: "communications",
+  });
+});
+
+test("a device id that could smuggle code into the frame is refused", () => {
+  assert.equal(micDeviceCommand('x");alert(1);("'), null);
+  assert.equal(micDeviceCommand(""), null);
+  assert.equal(speakerDeviceCommand("a b"), null);
+});
+
+test("the current-devices probe reports under its own key", () => {
+  assert.equal(CURRENT_DEVICES_COMMAND.function, "eval");
+  assert.ok(CURRENT_DEVICES_COMMAND.value.includes(`{${CURRENT_DEVICES_KEY}:`));
+  assert.ok(CURRENT_DEVICES_COMMAND.value.includes("getSettings"));
+});
+
+test("the engine's device list becomes two clean menus", () => {
+  const lists = parseDeviceList([
+    { deviceId: "default", kind: "audioinput", label: "Default - Earbuds" },
+    { deviceId: "abc", kind: "audioinput", label: "Earbuds" },
+    { deviceId: "abc", kind: "audioinput", label: "Earbuds (dup)" },
+    { deviceId: "cam", kind: "videoinput", label: "Camera" },
+    { deviceId: "out1", kind: "audiooutput", label: "" },
+    { deviceId: "bad id", kind: "audioinput", label: "nope" },
+    null,
+    "junk",
+  ]);
+  assert.deepEqual(lists.mics, [
+    { deviceId: "default", label: "Default - Earbuds" },
+    { deviceId: "abc", label: "Earbuds" },
+  ]);
+  assert.deepEqual(lists.speakers, [{ deviceId: "out1", label: "Speaker 1" }]);
+  assert.deepEqual(parseDeviceList(undefined), { mics: [], speakers: [] });
 });
